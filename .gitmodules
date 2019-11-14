@@ -3,7 +3,7 @@
 	url = https://github.com/chypriote/GWCodexTitle
 
 [submodule "KurzickFarm"]
-	path = CodexTitle
+	path = KurzickFarm
 	url = https://github.com/chypriote/GWKurzickFarm
 
 [submodule "TitlePackage"]
