@@ -1,6 +1,5 @@
-; Version 3.7.11
-; After the Update from 2019/05/01
-; Last Updated 8.8.19
+; Version 4.0.0
+; 2019-11-14
 
 #include-once
 #RequireAdmin
@@ -274,7 +273,7 @@ Func Initialize($aGW, $bChangeTitle = True, $notUsed1 = 0, $notUsed2 = 0)
     SetValue('PacketLocation', '0x' & Hex(MemoryRead(GetScannedAddress('ScanBaseOffset', -3)), 8))
     $mPing = MemoryRead(GetScannedAddress('ScanPing', -8))
     $mMapID = MemoryRead(GetScannedAddress('ScanMapID', 71))
-    $mLoggedIn = MemoryRead(GetScannedAddress('ScanLoggedIn', -3)) - 0x198
+    $mLoggedIn = MemoryRead(GetScannedAddress('ScanLoggedIn', -3)) + 4
     $mRegion = MemoryRead(GetScannedAddress('ScanRegion', 8))
     $mLanguage = MemoryRead(GetScannedAddress('ScanLanguage', 8)) + 12
     $mSkillBase = MemoryRead(GetScannedAddress('ScanSkillBase', 9))
@@ -323,7 +322,7 @@ Func Initialize($aGW, $bChangeTitle = True, $notUsed1 = 0, $notUsed2 = 0)
     SetValue('SalvageGlobal', MemoryRead(MemoryRead(GetValue('ScanSalvageGlobal') + 8) + 1))
     SetValue('MoveFunction', '0x' & Hex(GetScannedAddress('ScanMoveFunction', 1), 8))
     SetValue('UseSkillFunction', '0x' & Hex(GetScannedAddress('ScanUseSkillFunction', 1), 8))
-    SetValue('ChangeTargetFunction', '0x' & Hex(GetScannedAddress('ScanChangeTargetFunction', -119), 8))
+    SetValue('ChangeTargetFunction', '0x' & Hex(GetScannedAddress('ScanChangeTargetFunction', -0x78), 8))
     SetValue('WriteChatFunction', '0x' & Hex(GetScannedAddress('ScanWriteChatFunction', 1), 8))
     SetValue('SellItemFunction', '0x' & Hex(GetScannedAddress('ScanSellItemFunction', -85), 8))
     SetValue('PacketSendFunction', '0x' & Hex(GetScannedAddress('ScanPacketSendFunction', 1), 8))
@@ -440,6 +439,8 @@ Func Scan()
     AddPattern('C38B75FC8B04B5')
     _('ScanUseSkillFunction:')
     AddPattern('558BEC83EC1053568BD9578BF2895DF0')
+    _('ScanChangeTargetFunction:')
+    AddPattern('33C03BDA0F95C033')
     _('ScanPacketSendFunction:')
     AddPattern('558BEC83EC2C5356578BF985')
     _('ScanBaseOffset:')
@@ -477,7 +478,7 @@ Func Scan()
     _('ScanTraderFunction:')
     AddPattern('8B45188B551085')
     _('ScanTraderHook:')
-    AddPattern('8955FC6A008D55F8B9BB')
+    AddPattern('8955FC6A008D55F8B9BA')
     _('ScanSleep:')
     AddPattern('5F5E5B741A6860EA0000')
     _('ScanSalvageFunction:')
@@ -843,13 +844,9 @@ Func BuySuperiorIdentificationKit($aQuantity = 1)
     BuyItem(6, $aQuantity, 500)
 EndFunc   ;==>BuySuperiorIdentificationKit
 
-func BuySalvageKit($aQuantity = 1)
-    buyItem(2, $aQuantity, 100)
-endFunc   ;==>buySalvageKit
-
-func BuyExpertSalvageKit($aQuantity = 1)
+Func BuyExpertSalvageKit($aQuantity = 1)
     buyItem(3, $aQuantity, 400)
-endFunc   ;==>buyExpertSalvageKit
+EndFunc   ;==>buyExpertSalvageKit
 
 ;~ Description: Request a quote to buy an item from a trader. Returns true if successful.
 Func TraderRequest($aModelID, $aExtraID = -1)
@@ -894,6 +891,26 @@ Func TraderBuy()
     Enqueue($mTraderBuyPtr, 4)
     Return True
 EndFunc   ;==>TraderBuy
+
+
+
+;~ Description: Use a skill and wait for it to be used.
+Func UseSkillEx($lSkill, $lTgt = -2, $aTimeout = 3000)
+    If GetIsDead(-2) Then Return
+    If Not IsRecharged($lSkill) Then Return
+    Local $Skill = GetSkillByID(GetSkillBarSkillID($lSkill, 0))
+    Local $Energy = StringReplace(StringReplace(StringReplace(StringMid(DllStructGetData($Skill, 'Unknown4'), 6, 1), 'C', '25'), 'B', '15'), 'A', '10')
+    If GetEnergy(-2) < $Energy Then Return
+    Local $lAftercast = DllStructGetData($Skill, 'Aftercast')
+    Local $lDeadlock = TimerInit()
+    UseSkill($lSkill, $lTgt)
+    Do
+        Sleep(50)
+        If GetIsDead(-2) = 1 Then Return
+        Until (Not IsRecharged($lSkill)) Or (TimerDiff($lDeadlock) > $aTimeout)
+    Sleep($lAftercast * 1000)
+EndFunc   ;==>UseSkillEx
+
 
 ;~ Description: Request a quote to sell an item to the trader.
 Func TraderRequestSell($aItem)
@@ -1237,65 +1254,65 @@ EndFunc   ;==>Attack
 ;~ Description: Turn character to the left.
 Func TurnLeft($aTurn)
     If $aTurn Then
-        Return PerformAction(0xA2, 0x1E)
+        Return PerformAction(0xA2, 0x18)
     Else
-        Return PerformAction(0xA2, 0x20)
+        Return PerformAction(0xA2, 0x1A)
     EndIf
 EndFunc   ;==>TurnLeft
 
 ;~ Description: Turn character to the right.
 Func TurnRight($aTurn)
     If $aTurn Then
-        Return PerformAction(0xA3, 0x1E)
+        Return PerformAction(0xA3, 0x18)
     Else
-        Return PerformAction(0xA3, 0x20)
+        Return PerformAction(0xA3, 0x1A)
     EndIf
 EndFunc   ;==>TurnRight
 
 ;~ Description: Move backwards.
 Func MoveBackward($aMove)
     If $aMove Then
-        Return PerformAction(0xAC, 0x1E)
+        Return PerformAction(0xAC, 0x18)
     Else
-        Return PerformAction(0xAC, 0x20)
+        Return PerformAction(0xAC, 0x1A)
     EndIf
 EndFunc   ;==>MoveBackward
 
 ;~ Description: Run forwards.
 Func MoveForward($aMove)
     If $aMove Then
-        Return PerformAction(0xAD, 0x1E)
+        Return PerformAction(0xAD, 0x18)
     Else
-        Return PerformAction(0xAD, 0x20)
+        Return PerformAction(0xAD, 0x1A)
     EndIf
 EndFunc   ;==>MoveForward
 
 ;~ Description: Strafe to the left.
 Func StrafeLeft($aStrafe)
     If $aStrafe Then
-        Return PerformAction(0x91, 0x1E)
+        Return PerformAction(0x91, 0x18)
     Else
-        Return PerformAction(0x91, 0x20)
+        Return PerformAction(0x91, 0x1A)
     EndIf
 EndFunc   ;==>StrafeLeft
 
 ;~ Description: Strafe to the right.
 Func StrafeRight($aStrafe)
     If $aStrafe Then
-        Return PerformAction(0x92, 0x1E)
+        Return PerformAction(0x92, 0x18)
     Else
-        Return PerformAction(0x92, 0x20)
+        Return PerformAction(0x92, 0x1A)
     EndIf
 EndFunc   ;==>StrafeRight
 
 ;~ Description: Auto-run.
 Func ToggleAutoRun()
-    Return PerformAction(0xB7, 0x1E)
+    Return PerformAction(0xB7, 0x18)
 EndFunc   ;==>ToggleAutoRun
 
 ;~ Description: Turn around.
 Func ReverseDirection()
-    Return PerformAction(0xB1, 0x1E)
+    Return PerformAction(0xB1, 0x18)
 EndFunc   ;==>ReverseDirection
 #EndRegion Movement
 
@@ -1368,105 +1385,105 @@ EndFunc   ;==>AbandonQuest
 #Region Windows
 ;~ Description: Close all in-game windows.
 Func CloseAllPanels()
-    Return PerformAction(0x85, 0x1E)
+    Return PerformAction(0x85, 0x18)
 EndFunc   ;==>CloseAllPanels
 
 ;~ Description: Toggle hero window.
 Func ToggleHeroWindow()
-    Return PerformAction(0x8A, 0x1E)
+    Return PerformAction(0x8A, 0x18)
 EndFunc   ;==>ToggleHeroWindow
 
 ;~ Description: Toggle inventory window.
 Func ToggleInventory()
-    Return PerformAction(0x8B, 0x1E)
+    Return PerformAction(0x8B, 0x18)
 EndFunc   ;==>ToggleInventory
 
 ;~ Description: Toggle all bags window.
 Func ToggleAllBags()
-    Return PerformAction(0xB8, 0x1E)
+    Return PerformAction(0xB8, 0x18)
 EndFunc   ;==>ToggleAllBags
 
 ;~ Description: Toggle world map.
 Func ToggleWorldMap()
-    Return PerformAction(0x8C, 0x1E)
+    Return PerformAction(0x8C, 0x18)
 EndFunc   ;==>ToggleWorldMap
 
 ;~ Description: Toggle options window.
 Func ToggleOptions()
-    Return PerformAction(0x8D, 0x1E)
+    Return PerformAction(0x8D, 0x18)
 EndFunc   ;==>ToggleOptions
 
 ;~ Description: Toggle quest window.
 Func ToggleQuestWindow()
-    Return PerformAction(0x8E, 0x1E)
+    Return PerformAction(0x8E, 0x18)
 EndFunc   ;==>ToggleQuestWindow
 
 ;~ Description: Toggle skills window.
 Func ToggleSkillWindow()
-    Return PerformAction(0x8F, 0x1E)
+    Return PerformAction(0x8F, 0x18)
 EndFunc   ;==>ToggleSkillWindow
 
 ;~ Description: Toggle mission map.
 Func ToggleMissionMap()
-    Return PerformAction(0xB6, 0x1E)
+    Return PerformAction(0xB6, 0x18)
 EndFunc   ;==>ToggleMissionMap
 
 ;~ Description: Toggle friends list window.
 Func ToggleFriendList()
-    Return PerformAction(0xB9, 0x1E)
+    Return PerformAction(0xB9, 0x18)
 EndFunc   ;==>ToggleFriendList
 
 ;~ Description: Toggle guild window.
 Func ToggleGuildWindow()
-    Return PerformAction(0xBA, 0x1E)
+    Return PerformAction(0xBA, 0x18)
 EndFunc   ;==>ToggleGuildWindow
 
 ;~ Description: Toggle party window.
 Func TogglePartyWindow()
-    Return PerformAction(0xBF, 0x1E)
+    Return PerformAction(0xBF, 0x18)
 EndFunc   ;==>TogglePartyWindow
 
 ;~ Description: Toggle score chart.
 Func ToggleScoreChart()
-    Return PerformAction(0xBD, 0x1E)
+    Return PerformAction(0xBD, 0x18)
 EndFunc   ;==>ToggleScoreChart
 
 ;~ Description: Toggle layout window.
 Func ToggleLayoutWindow()
-    Return PerformAction(0xC1, 0x1E)
+    Return PerformAction(0xC1, 0x18)
 EndFunc   ;==>ToggleLayoutWindow
 
 ;~ Description: Toggle minions window.
 Func ToggleMinionList()
-    Return PerformAction(0xC2, 0x1E)
+    Return PerformAction(0xC2, 0x18)
 EndFunc   ;==>ToggleMinionList
 
 ;~ Description: Toggle a hero panel.
 Func ToggleHeroPanel($aHero)
     If $aHero < 4 Then
-        Return PerformAction(0xDB + $aHero, 0x1E)
+        Return PerformAction(0xDB + $aHero, 0x18)
     ElseIf $aHero < 8 Then
-        Return PerformAction(0xFE + $aHero, 0x1E)
+        Return PerformAction(0xFE + $aHero, 0x18)
     EndIf
 EndFunc   ;==>ToggleHeroPanel
 
 ;~ Description: Toggle hero's pet panel.
 Func ToggleHeroPetPanel($aHero)
     If $aHero < 4 Then
-        Return PerformAction(0xDF + $aHero, 0x1E)
+        Return PerformAction(0xDF + $aHero, 0x18)
     ElseIf $aHero < 8 Then
-        Return PerformAction(0xFA + $aHero, 0x1E)
+        Return PerformAction(0xFA + $aHero, 0x18)
     EndIf
 EndFunc   ;==>ToggleHeroPetPanel
 
 ;~ Description: Toggle pet panel.
 Func TogglePetPanel()
-    Return PerformAction(0xDF, 0x1E)
+    Return PerformAction(0xDF, 0x18)
 EndFunc   ;==>TogglePetPanel
 
 ;~ Description: Toggle help window.
 Func ToggleHelpWindow()
-    Return PerformAction(0xE4, 0x1E)
+    Return PerformAction(0xE4, 0x18)
 EndFunc   ;==>ToggleHelpWindow
 #EndRegion Windows
 
@@ -1500,68 +1517,69 @@ EndFunc   ;==>CallTarget
 
 ;~ Description: Clear current target.
 Func ClearTarget()
-    Return PerformAction(0xE3, 0x1E)
+    Return PerformAction(0xE3, 0x18)
 EndFunc   ;==>ClearTarget
 
 ;~ Description: Target the nearest enemy.
 Func TargetNearestEnemy()
     Local $target = GetNearestEnemyToAgent(-2)
-    Return PerformAction(0x93, 0x1E)
+    ChangeTarget($target)
+    ;Return PerformAction(0x93, 0x18)
 EndFunc   ;==>TargetNearestEnemy
 
 ;~ Description: Target the next enemy.
 Func TargetNextEnemy()
-    Return PerformAction(0x95, 0x1E)
+    Return PerformAction(0x95, 0x18)
 EndFunc   ;==>TargetNextEnemy
 
 ;~ Description: Target the next party member.
 Func TargetPartyMember($aNumber)
-    If $aNumber > 0 And $aNumber < 13 Then Return PerformAction(0x95 + $aNumber, 0x1E)
+    If $aNumber > 0 And $aNumber < 13 Then Return PerformAction(0x95 + $aNumber, 0x18)
 EndFunc   ;==>TargetPartyMember
 
 ;~ Description: Target the previous enemy.
 Func TargetPreviousEnemy()
-    Return PerformAction(0x9E, 0x1E)
+    Return PerformAction(0x9E, 0x18)
 EndFunc   ;==>TargetPreviousEnemy
 
 ;~ Description: Target the called target.
 Func TargetCalledTarget()
-    Return PerformAction(0x9F, 0x1E)
+    Return PerformAction(0x9F, 0x18)
 EndFunc   ;==>TargetCalledTarget
 
 ;~ Description: Target yourself.
 Func TargetSelf()
-    Return PerformAction(0xA0, 0x1E)
+    Return PerformAction(0xA0, 0x18)
 EndFunc   ;==>TargetSelf
 
 ;~ Description: Target the nearest ally.
 Func TargetNearestAlly()
-    Return PerformAction(0xBC, 0x1E)
+    Return PerformAction(0xBC, 0x18)
 EndFunc   ;==>TargetNearestAlly
 
 ;~ Description: Target the nearest item.
 Func TargetNearestItem()
-    Return PerformAction(0xC3, 0x1E)
+    Return PerformAction(0xC3, 0x18)
 EndFunc   ;==>TargetNearestItem
 
 ;~ Description: Target the next item.
 Func TargetNextItem()
-    Return PerformAction(0xC4, 0x1E)
+    Return PerformAction(0xC4, 0x18)
 EndFunc   ;==>TargetNextItem
 
 ;~ Description: Target the previous item.
 Func TargetPreviousItem()
-    Return PerformAction(0xC5, 0x1E)
+    Return PerformAction(0xC5, 0x18)
 EndFunc   ;==>TargetPreviousItem
 
 ;~ Description: Target the next party member.
 Func TargetNextPartyMember()
-    Return PerformAction(0xCA, 0x1E)
+    Return PerformAction(0xCA, 0x18)
 EndFunc   ;==>TargetNextPartyMember
 
 ;~ Description: Target the previous party member.
 Func TargetPreviousPartyMember()
-    Return PerformAction(0xCB, 0x1E)
+    Return PerformAction(0xCB, 0x18)
 EndFunc   ;==>TargetPreviousPartyMember
 #EndRegion Targeting
 
@@ -1585,18 +1603,18 @@ EndFunc   ;==>DisplayAll
 ;~ Description: Display the names of allies.
 Func DisplayAllies($aDisplay)
     If $aDisplay Then
-        Return PerformAction(0x89, 0x1E)
+        Return PerformAction(0x89, 0x18)
     Else
-        Return PerformAction(0x89, 0x20)
+        Return PerformAction(0x89, 0x1A)
     EndIf
 EndFunc   ;==>DisplayAllies
 
 ;~ Description: Display the names of enemies.
 Func DisplayEnemies($aDisplay)
     If $aDisplay Then
-        Return PerformAction(0x94, 0x1E)
+        Return PerformAction(0x94, 0x18)
     Else
-        Return PerformAction(0x94, 0x20)
+        Return PerformAction(0x94, 0x1A)
     EndIf
 EndFunc   ;==>DisplayEnemies
 #EndRegion Display
@@ -1677,7 +1695,7 @@ EndFunc   ;==>SendChat
 #Region Misc
 ;~ Description: Change weapon sets.
 Func ChangeWeaponSet($aSet)
-    Return PerformAction(0x80 + $aSet, 0x1E)
+    Return PerformAction(0x80 + $aSet, 0x18)
 EndFunc   ;==>ChangeWeaponSet
 
 ;~ Description: Use a skill.
@@ -1703,30 +1721,30 @@ EndFunc   ;==>CancelAction
 
 ;~ Description: Same as hitting spacebar.
 Func ActionInteract()
-    Return PerformAction(0x80, 0x1E)
+    Return PerformAction(0x80, 0x18)
 EndFunc   ;==>ActionInteract
 
 ;~ Description: Follow a player.
 Func ActionFollow()
-    Return PerformAction(0xCC, 0x1E)
+    Return PerformAction(0xCC, 0x18)
 EndFunc   ;==>ActionFollow
 
 ;~ Description: Drop environment object.
 Func DropBundle()
-    Return PerformAction(0xCD, 0x1E)
+    Return PerformAction(0xCD, 0x18)
 EndFunc   ;==>DropBundle
 
 ;~ Description: Clear all hero flags.
 Func ClearPartyCommands()
-    Return PerformAction(0xDB, 0x1E)
+    Return PerformAction(0xDB, 0x18)
 EndFunc   ;==>ClearPartyCommands
 
 ;~ Description: Suppress action.
 Func SuppressAction($aSuppress)
     If $aSuppress Then
-        Return PerformAction(0xD0, 0x1E)
+        Return PerformAction(0xD0, 0x18)
     Else
-        Return PerformAction(0xD0, 0x20)
+        Return PerformAction(0xD0, 0x1A)
     EndIf
 EndFunc   ;==>SuppressAction
 
@@ -1742,7 +1760,7 @@ Func DropBuff($aSkillID, $aAgentID, $aHeroNumber = 0)
     Local $lBuffStructAddress
     Local $lOffset[4]
     $lOffset[0] = 0
-    $lOffset[1] = 0x1E
+    $lOffset[1] = 0x18
     $lOffset[2] = 0x2C
     $lOffset[3] = 0x510
     Local $lCount = MemoryReadPtr($mBasePointer, $lOffset)
@@ -1770,7 +1788,7 @@ EndFunc   ;==>DropBuff
 
 ;~ Description: Take a screenshot.
 Func MakeScreenshot()
-    Return PerformAction(0xAE, 0x1E)
+    Return PerformAction(0xAE, 0x18)
 EndFunc   ;==>MakeScreenshot
 
 ;~ Description: Invite a player to the party.
@@ -1923,7 +1941,7 @@ EndFunc   ;==>EnsureEnglish
 
 ;~ Description: Change game language.
 Func ToggleLanguage()
-    DllStructSetData($mToggleLanguage, 2, 0x1E)
+    DllStructSetData($mToggleLanguage, 2, 0x18)
     Enqueue($mToggleLanguagePtr, 8)
 EndFunc   ;==>ToggleLanguage
 
@@ -1985,7 +2003,7 @@ EndFunc   ;==>FloatToInt
 #Region Titles
 ;~ Description: Returns Hero title progress.
 Func GetHeroTitle()
-    Local $lOffset[5] = [0, 0x1E, 0x2C, 0x81C, 0x4]
+    Local $lOffset[5] = [0, 0x18, 0x2C, 0x81C, 0x4]
     Local $lReturn = MemoryReadPtr($mBasePointer, $lOffset)
     Return $lReturn[1]
 EndFunc   ;==>GetHeroTitle
@@ -3506,7 +3524,7 @@ Func GetQuestByID($aQuestID = 0)
     $lQuestLogSize = MemoryReadPtr($mBasePointer, $lOffset)
 
     If $aQuestID = 0 Then
-        $lOffset[1] = 0x11E
+        $lOffset[1] = 0x18
         $lOffset[2] = 0x2C
         $lOffset[3] = 0x528
         $lQuestID = MemoryReadPtr($mBasePointer, $lOffset)
@@ -3530,12 +3548,8 @@ Func GetCharname()
 EndFunc   ;==>GetCharname
 
 ;~ Description: Returns if you're logged in.
-Func GetLoggedIn_Old()
+Func GetLoggedIn()
     Return MemoryRead($mLoggedIn)
- EndFunc   ;==>GetLoggedIn
-
- Func GetLoggedIn() ;New 5.19.19
-    Return MemoryRead($mLoggedIn) > 0 ? 1 : 0
 EndFunc   ;==>GetLoggedIn
 
 ;~ Description: Returns the number of character slots you have. Only works on character select.
@@ -3554,7 +3568,7 @@ EndFunc   ;==>GetDisplayLanguage
 Func GetInstanceUpTime()
     Local $lOffset[4]
     $lOffset[0] = 0
-    $lOffset[1] = 0x1E
+    $lOffset[1] = 0x18
     $lOffset[2] = 0x8
     $lOffset[3] = 0x1AC
     Local $lTimer = MemoryReadPtr($mBasePointer, $lOffset)
@@ -5313,29 +5327,32 @@ Func ToggleRendering()
     $Rendering = Not $Rendering
 EndFunc
 
-Func GetNumberOfFoesInRangeOfAgent($aAgent = -2, $aRange = 1250)
-    Local $lAgent, $lDistance
-    Local $lCount = 0
-
-    If Not IsDllStruct($aAgent) Then $aAgent = GetAgentByID($aAgent)
-
-    For $i = 1 To GetMaxAgents()
-        $lAgent = GetAgentByID($i)
-        If BitAND(DllStructGetData($lAgent, 'typemap'), 262144) Then ContinueLoop
-        If DllStructGetData($lAgent, 'Type') <> 0xDB Then ContinueLoop
-        If DllStructGetData($lAgent, 'Allegiance') <> 3 Then ContinueLoop
-
-            If DllStructGetData($lAgent, 'HP') <= 0 Then ContinueLoop
-        If BitAND(DllStructGetData($lAgent, 'Effects'), 0x0010) > 0 Then ContinueLoop
-        $lDistance = GetDistance($lAgent)
-
-        If $lDistance > $aRange Then ContinueLoop
-        $lCount += 1
-    Next
-    Return $lCount
- EndFunc   ;==>GetNumberOfFoesInRangeOfAgent
-
 Func IsRecharged($lSkill)
     Return GetSkillbarSkillRecharge($lSkill) == 0
 EndFunc   ;==>IsRecharged
+
+Func Disconnected()
+    Out("Disconnected!")
+    Out("Attempting to reconnect.")
+    ControlSend(GetWindowHandle(), "", "", "{Enter}")
+    Local $lCheck = False
+    Local $lDeadlock = TimerInit()
+    Do
+        Sleep(20)
+        $lCheck = GetMapLoading() <> 2 And GetAgentExists(-2)
+    Until $lCheck Or TimerDiff($lDeadlock) > 60000
+    If Not $lCheck Then
+        Out("Failed to Reconnect!")
+        Out("Retrying.")
+        ControlSend(GetWindowHandle(), "", "", "{Enter}")
+        $lDeadlock = TimerInit()
+        Do
+            Sleep(20)
+            $lCheck = GetMapLoading() <> 2 And GetAgentExists(-2)
+        Until $lCheck Or TimerDiff($lDeadlock) > 60000
+        If Not $lCheck == False Then Out("Could not reconnect!")
+    EndIf
+    Out("Reconnected!")
+    Sleep(5000)
+EndFunc
 #EndRegion Other Functions
