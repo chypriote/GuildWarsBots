@@ -1,0 +1,32 @@
+[submodule "CodexTitle"]
+	path = CodexTitle
+	url = https://github.com/chypriote/GWCodexTitle
+
+[submodule "KurzickFarm"]
+	path = CodexTitle
+	url = https://github.com/chypriote/GWKurzickFarm
+
+[submodule "TitlePackage"]
+	path = TitlePackage
+	url = https://github.com/chypriote/GWTitlePackage
+
+[submodule "BorealRun"]
+	path = BorealRun
+	url = https://github.com/chypriote/GWBorealRun
+
+[submodule "HeroBook"]
+	path = HeroBook
+	url = https://github.com/chypriote/GWHeroBook
+
+[submodule "NornChallenge"]
+	path = NornChallenge
+	url = https://github.com/chypriote/GWNornChallenge
+
+[submodule "FeatherFarmer"]
+	path = FeatherFarmer
+	url = https://github.com/chypriote/GWFeatherFarmer
+
+[submodule "DervishFarmer"]
+	path = DervishFarmer
+	url = https://github.com/chypriote/GWCoFFarmer
+
