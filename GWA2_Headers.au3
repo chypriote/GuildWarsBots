@@ -32,7 +32,7 @@ Global Const $HEADER_HEROES_KICK = 0x24	;Kicks ALL heroes from party
 ;=PARTY= not touched
 Global Const $HEADER_PARTY_PLACE_FLAG = 0x1F	;Sets the party position flag, all party-npcs runs to position
 Global Const $HEADER_PARTY_CLEAR_FLAG = 0x1F	;Clears the party position flag
-Global Const $HEADER_HENCHMAN_ADD = 0xA6	;Adds henchman to party
+Global Const $HEADER_HENCHMAN_ADD = 0xA5	;Adds henchman to party
 Global Const $HEADER_PARTY_LEAVE = 0xA8	;Leaves the party
 Global Const $HEADER_HENCHMAN_KICK = 0xAD	;Kicks a henchman from party
 Global Const $HEADER_INVITE_TARGET = 0xA6	;Invite target player to party
@@ -40,7 +40,7 @@ Global Const $HEADER_INVITE_CANCEL = 0xA3	;Cancel invitation of player
 Global Const $HEADER_INVITE_ACCEPT = 0xA2	;Accept invitation to party
 
 ;=TARGET (Enemies or NPC)= not touched
-Global Const $HEADER_CALL_TARGET = 0x28	;Calls the target without attacking (Ctrl+Shift+Space)
+Global Const $HEADER_CALL_TARGET = 0x2C	;Calls the target without attacking (Ctrl+Shift+Space)
 Global Const $HEADER_ATTACK_AGENT = 0x2C	;Attacks agent (Space IIRC)
 Global Const $HEADER_CANCEL_ACTION = 0x2E	;Cancels the current action
 Global Const $HEADER_AGENT_FOLLOW = 0x39	;Follows the agent/npc. Ctrl+Click triggers "I am following Person" in chat
@@ -105,7 +105,7 @@ Global Const $HEADER_SKILL_USE_ID = 0x4C	;
 Global Const $HEADER_SET_ATTRIBUTES = 0x10	;hidden in init stuff like sendchat
 
 ;=CHEST= not touched
-Global Const $HEADER_CHEST_OPEN = 0x59	;Opens a chest (with key AFAIK)
+Global Const $HEADER_CHEST_OPEN = 0x57	;Opens a chest (with key AFAIK)
 
 Global Const $HEADER_GOLD_MOVE = 0x82	;Moves Gold (from chest to inventory, and otherway around IIRC)
 
@@ -119,5 +119,5 @@ Global Const $HEADER_OUTPOST_RETURN = 0xAE	;Returns to outpost after /resign
 Global Const $HEADER_SEND_CHAT = 0x6A	;Needed for sending messages in chat
 
 ;=OTHER CONSTANTS=
-Global Const $HEADER_MAX_ATTRIBUTES_CONST_5 = 0x10	;constant at word 5 of max attrib packet. Changed from 3 to four in most recent update
-Global Const $HEADER_MAX_ATTRIBUTES_CONST_22	= 0x10	;constant at word 22 of max attrib packet. Changed from 3 to four in most recent update
+Global Const $HEADER_MAX_ATTRIBUTES_CONST_5 = 0x04	;constant at word 5 of max attrib packet. Changed from 3 to four in most recent update
+Global Const $HEADER_MAX_ATTRIBUTES_CONST_22	= 0x04	;constant at word 22 of max attrib packet. Changed from 3 to four in most recent update

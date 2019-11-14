@@ -893,7 +893,9 @@ Func BuySuperiorIdentificationKit($aQuantity = 1)
 	BuyItem(6, $aQuantity, 500)
 EndFunc   ;==>BuySuperiorIdentificationKit
 
-
+func BuySalvageKit($aQuantity = 1)
+	buyItem(2, $aQuantity, 100)
+endFunc   ;==>buySalvageKit
 
 func BuyExpertSalvageKit($aQuantity = 1)
 	buyItem(3, $aQuantity, 400)
@@ -942,26 +944,6 @@ Func TraderBuy()
 	Enqueue($mTraderBuyPtr, 4)
 	Return True
 EndFunc   ;==>TraderBuy
-
-
-
-;~ Description: Use a skill and wait for it to be used.
-Func UseSkillEx($lSkill, $lTgt = -2, $aTimeout = 3000)
-    If GetIsDead(-2) Then Return
-    If Not IsRecharged($lSkill) Then Return
-    Local $Skill = GetSkillByID(GetSkillBarSkillID($lSkill, 0))
-    Local $Energy = StringReplace(StringReplace(StringReplace(StringMid(DllStructGetData($Skill, 'Unknown4'), 6, 1), 'C', '25'), 'B', '15'), 'A', '10')
-    If GetEnergy(-2) < $Energy Then Return
-    Local $lAftercast = DllStructGetData($Skill, 'Aftercast')
-    Local $lDeadlock = TimerInit()
-    UseSkill($lSkill, $lTgt)
-    Do
-	    Sleep(50)
-	    If GetIsDead(-2) = 1 Then Return
-	    Until (Not IsRecharged($lSkill)) Or (TimerDiff($lDeadlock) > $aTimeout)
-    Sleep($lAftercast * 1000)
-EndFunc   ;==>UseSkillEx
-
 
 ;~ Description: Request a quote to sell an item to the trader.
 Func TraderRequestSell($aItem)
@@ -5378,36 +5360,57 @@ Func ToggleRendering()
 	$Rendering = Not $Rendering
 EndFunc
 
+Func GetNumberOfFoesInRangeOfAgent($aAgent = -2, $aRange = 1250)
+	Local $lAgent, $lDistance
+	Local $lCount = 0
+
+	If Not IsDllStruct($aAgent) Then $aAgent = GetAgentByID($aAgent)
+
+	For $i = 1 To GetMaxAgents()
+		$lAgent = GetAgentByID($i)
+		If BitAND(DllStructGetData($lAgent, 'typemap'), 262144) Then ContinueLoop
+		If DllStructGetData($lAgent, 'Type') <> 0xDB Then ContinueLoop
+		If DllStructGetData($lAgent, 'Allegiance') <> 3 Then ContinueLoop
+
+		     If DllStructGetData($lAgent, 'HP') <= 0 Then ContinueLoop
+		If BitAND(DllStructGetData($lAgent, 'Effects'), 0x0010) > 0 Then ContinueLoop
+		$lDistance = GetDistance($lAgent)
+
+		If $lDistance > $aRange Then ContinueLoop
+		$lCount += 1
+	Next
+	Return $lCount
+ EndFunc   ;==>GetNumberOfFoesInRangeOfAgent
 
 Func IsRecharged($lSkill)
 	Return GetSkillbarSkillRecharge($lSkill) == 0
 EndFunc   ;==>IsRecharged
 
-Func Disconnected()
-	Out("Disconnected!")
-	Out("Attempting to reconnect.")
-	ControlSend(GETWINDOWHANDLE(), "", "", "{Enter}")
-	Local $LCHECK = False
-	Local $LDEADLOCK = TimerInit()
-	Do
-		Sleep(20)
-		$LCHECK = GETMAPLOADING() <> 2 And GETAGENTEXISTS(-2)
-	Until $LCHECK Or TimerDiff($LDEADLOCK) > 60000
-	If $LCHECK = False Then
-		Out("Failed to Reconnect!")
-		Out("Retrying.")
-		ControlSend(GETWINDOWHANDLE(), "", "", "{Enter}")
-		$LDEADLOCK = TimerInit()
-		Do
-			Sleep(20)
-			$LCHECK = GETMAPLOADING() <> 2 And GETAGENTEXISTS(-2)
-		Until $LCHECK Or TimerDiff($LDEADLOCK) > 60000
-		If $LCHECK = False Then
-			Out("Could not reconnect!")
-			Out("Exiting.")
+Func PickUpLoot()
+	Local $lAgent
+	Local $aitem
+	Local $lDeadlock
+	For $i = 1 To GetMaxAgents()
+		If GetIsDead(-2) Then Return
+		$lAgent = GetAgentByID($i)
+		If DllStructGetData($lAgent, 'Type') <> 0x400 Then ContinueLoop
+		$aitem = GetItemByAgentID($i)
+		If CanPickUp($aitem) Then
+			PickUpItem($aitem)
+			$lDeadlock = TimerInit()
+			While GetAgentExists($i)
+				Sleep(100)
+				If GetIsDead(-2) Then Return
+				If TimerDiff($lDeadlock) > 10000 Then ExitLoop
+			WEnd
 		EndIf
-	EndIf
-	Out("Reconnected!")
-	Sleep(5000)
- EndFunc
+	Next
+EndFunc   ;==>PickUpLoot
+
+Func _PurgeHook()
+	; ToggleRendering()
+	Sleep(Random(4000, 5000))
+	; ToggleRendering()
+EndFunc   ;==>_PurgeHook
+
 #EndRegion Other Functions
