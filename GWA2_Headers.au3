@@ -106,7 +106,6 @@ Global Const $HEADER_SET_ATTRIBUTES = 0x10	;hidden in init stuff like sendchat
 
 ;=CHEST= not touched
 Global Const $HEADER_CHEST_OPEN = 0x59	;Opens a chest (with key AFAIK)
-
 Global Const $HEADER_GOLD_MOVE = 0x82	;Moves Gold (from chest to inventory, and otherway around IIRC)
 
 ;=MISSION=
@@ -120,4 +119,4 @@ Global Const $HEADER_SEND_CHAT = 0x6A	;Needed for sending messages in chat
 
 ;=OTHER CONSTANTS=
 Global Const $HEADER_MAX_ATTRIBUTES_CONST_5 = 0x10	;constant at word 5 of max attrib packet. Changed from 3 to four in most recent update
-Global Const $HEADER_MAX_ATTRIBUTES_CONST_22	= 0x10	;constant at word 22 of max attrib packet. Changed from 3 to four in most recent update
+Global Const $HEADER_MAX_ATTRIBUTES_CONST_22 = 0x10	;constant at word 22 of max attrib packet. Changed from 3 to four in most recent update
