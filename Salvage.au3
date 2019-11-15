@@ -256,10 +256,11 @@ EndFunc ;Salvage
 Func SalvageCrests($item)
     Local $q = DllStructGetData($item, 'Quantity')
     For $i = 0 to $q
+        RetrieveSalvageKit()
         StartSalvage($item, True) ;noSleep
         RndSleep(250)
         SalvageMaterials()
-        RndSleep(750)
+        RndSleep(500)
         $i += 1
     Next
 EndFunc
