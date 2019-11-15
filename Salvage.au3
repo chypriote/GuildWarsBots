@@ -62,6 +62,7 @@ Global $BAGS_TO_USE = 4
     ;~ Materials
     Global $ALL_MATERIALS_ARRAY[36] = [921, 922, 923, 925, 926, 927, 928, 929, 930, 931, 932, 933, 934, 935, 936, 937, 938, 939, 940, 941, 942, 943, 944, 945, 946, 948, 949, 950, 951, 952, 953, 954, 955, 956, 6532, 6533]
     Global $COMMON_MATERIALS_ARRAY[11] = [921, 925, 929, 933, 934, 940, 946, 948, 953, 954, 955]
+    Global Const $ITEM_ID_FEATHERED_CREST = 835
     Global $RARE_MATERIALS_ARRAY[25] = [922, 923, 926, 927, 928, 930, 931, 932, 935, 936, 937, 938, 939, 941, 942, 943, 944, 945, 949, 950, 951, 952, 956, 6532, 6533]
     #cs
         Lumps of Charcoal 922
@@ -242,6 +243,7 @@ Func Salvage()
         RetrieveSalvageKit()
         For $j = 1 To DllStructGetData($bag, 'Slots')
             $item = GetItemBySlot($i, $j)
+            If DllStructGetData($item, "ModelId") == $ITEM_ID_FEATHERED_CREST Then SalvageCrests($item)
             If CanSalvage($item) Then
                 StartSalvage($item, True) ;noSleep
                 RndSleep(250)
@@ -251,6 +253,16 @@ Func Salvage()
         Next
     Next
 EndFunc ;Salvage
+Func SalvageCrests($item)
+    Local $q = DllStructGetData($item, 'Quantity')
+    For $i = 0 to $q
+        StartSalvage($item, True) ;noSleep
+        RndSleep(250)
+        SalvageMaterials()
+        RndSleep(750)
+        $i += 1
+    Next
+EndFunc
 Func CanSalvage($item)
     Local $ModelID = DllStructGetData($item, "ModelId")
     Local $rarity = GetRarity($item)
@@ -260,13 +272,7 @@ Func CanSalvage($item)
     If $rarity == $RARITY_BLUE		  Then Return True
     If $rarity == $RARITY_PURPLE		Then Return False
 
-    If $ModelID == $ITEM_DYES Then
-        ;Uncomment for Only black and white dyes
-        ;Local $ExtraID = DllStructGetData($item, "ExtraId")
-        ;Return $ExtraID <> $ITEM_BLACK_DYE And $ExtraID <> $ITEM_WHITE_DYE)
-        Return False
-    EndIf ;Dies
-
+    If $ModelID == $ITEM_DYES                       Then Return False
     If InArray($ModelID, $SPECIAL_DROPS)            Then Return False
     If InArray($ModelID, $ALL_TOMES_ARRAY)		    Then Return False ;Tomes
     If InArray($ModelID, $ALL_MATERIALS_ARRAY)		Then Return False ;Materials

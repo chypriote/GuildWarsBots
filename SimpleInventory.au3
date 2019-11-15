@@ -24,12 +24,11 @@ Global Const $THIRD_DIALOG = 0x7F
 #Region Inventory
 Func Inventory()
     Out("Going to merchant")
-    GoToNPC(GetNearestNPCToCoords(-19166, 17980)) ;Doomlore
-    RndSleep(550)
-    Dialog($THIRD_DIALOG)
-    RndSleep(550)
-    ;GoToNPC(GetNearestNPCToCoords(8481, 2005)) ;Kurzick
-    ;GoMerchant() ;TODO
+    ;GoToNPC(GetNearestNPCToCoords(-19166, 17980)) ;Doomlore
+    ;RndSleep(550)
+    ;Dialog($THIRD_DIALOG)
+    ;RndSleep(550)
+    GoMerchant() ;TODO
 
     Out("Storing")
     Store()
