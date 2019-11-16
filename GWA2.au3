@@ -3452,18 +3452,14 @@ Func WaitMapLoading($aMapID = 0, $aDeadlock = 15000)
     Local $lMapLoading
     Local $lDeadlock = TimerInit()
 
-    Out("1")
     InitMapLoad()
 
-    Out("2")
     Do
-        Out("3")
-        Sleep(100)
+        Sleep(200)
         $lMapLoading = GetMapLoading()
         If $lMapLoading == 2 Then $lDeadlock = TimerInit()
         If TimerDiff($lDeadlock) > $aDeadlock And $aDeadlock > 0 Then Return False
     Until $lMapLoading <> 2 And GetMapIsLoaded() And (GetMapID() = $aMapID Or $aMapID = 0)
-
     RndSleep(500)
 
     Return GetMapID() == $aMapID 

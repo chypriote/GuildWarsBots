@@ -42,7 +42,7 @@ Global $BAGS_TO_USE = 4
     Global $TONIC_PARTY_ARRAY[23] = [4730, 15837, 21490, 22192, 30624, 30626, 30628, 30630, 30632, 30634, 30636, 30638, 30640, 30642, 30646, 30648, 31020, 31141, 31142, 31144, 31172, 37771, 37772]
 
     ;~ Special Drops
-    Global $SPECIAL_DROPS[7] = [556, 18345, 21491, 37765, 21833, 28433, 28434]
+    Global $SPECIAL_DROPS_ARRAY[7] = [556, 18345, 21491, 37765, 21833, 28433, 28434]
     #cs
         CC_Shard = 556
         Flame_of_Balthazar = 2514
@@ -62,7 +62,7 @@ Global $BAGS_TO_USE = 4
     ;~ Materials
     Global $ALL_MATERIALS_ARRAY[36] = [921, 922, 923, 925, 926, 927, 928, 929, 930, 931, 932, 933, 934, 935, 936, 937, 938, 939, 940, 941, 942, 943, 944, 945, 946, 948, 949, 950, 951, 952, 953, 954, 955, 956, 6532, 6533]
     Global $COMMON_MATERIALS_ARRAY[11] = [921, 925, 929, 933, 934, 940, 946, 948, 953, 954, 955]
-    Global Const $ITEM_ID_FEATHERED_CREST = 835
+    Global Const $ITEM_FEATHERED_CREST = 835
     Global $RARE_MATERIALS_ARRAY[25] = [922, 923, 926, 927, 928, 930, 931, 932, 935, 936, 937, 938, 939, 941, 942, 943, 944, 945, 949, 950, 951, 952, 956, 6532, 6533]
     #cs
         Lumps of Charcoal 922
@@ -118,12 +118,12 @@ Global $BAGS_TO_USE = 4
     Global $ALL_TITLE_ITEMS[49]=[910, 2513, 5585, 6049, 6366, 6367, 6375, 15477, 19171, 19172, 19173, 22190, 24593, 28435, 30855, 31145, 31146, 35124, 36682, 15528, 15479, 19170, 21492, 21812, 22644, 30208, 31150, 35125, 36681, 17060, 17061, 17062, 22269, 22752, 28431, 28432, 28436, 29431, 31151, 31152, 31153, 35121, 6368, 6369, 6376, 21809, 21810, 21813, 36683]
 
     ;~ Special Drops (Trophies)
-    Global $STACKABLE_TROPHIES_ARRAY[5] = [27047, 27052, 27033, 24353, 24354]
+    Global $ALL_TROPHIES_ARRAY[5] = [27047, 27052, 27033, 24353, 24354]
     Global Const $ITEM_GLACIAL_STONES = 27047
     Global Const $ITEM_SUPERIOR_CHARR_CARVING = 27052
     Global Const $ITEM_DESTROYER_CORE = 27033
-    Global Const $ITEM_DIESSA_CHALICE = 24353
-    Global COnst $ITEM_RIN_RELIC = 24354
+    Global Const $TROPHY_DIESSA_CHALICE = 24353
+    Global Const $TROPHY_RIN_RELIC = 24354
 
     ;~ Tomes
     Global $ALL_TOMES_ARRAY[20] = [21786, 21787, 21788, 21789, 21790, 21791, 21792, 21793, 21794, 21795, 21796, 21797, 21798, 21799, 21800, 21801, 21802, 21803, 21804, 21805]
@@ -243,7 +243,7 @@ Func Salvage()
         RetrieveSalvageKit()
         For $j = 1 To DllStructGetData($bag, 'Slots')
             $item = GetItemBySlot($i, $j)
-            If DllStructGetData($item, "ModelId") == $ITEM_ID_FEATHERED_CREST Then SalvageCrests($item)
+            If DllStructGetData($item, "ModelId") == $ITEM_FEATHERED_CREST Then SalvageCrests($item)
             If CanSalvage($item) Then
                 StartSalvage($item, True) ;noSleep
                 RndSleep(250)
@@ -261,7 +261,6 @@ Func SalvageCrests($item)
         RndSleep(250)
         SalvageMaterials()
         RndSleep(500)
-        $i += 1
     Next
 EndFunc
 Func CanSalvage($item)
@@ -274,10 +273,10 @@ Func CanSalvage($item)
     If $rarity == $RARITY_PURPLE		Then Return False
 
     If $ModelID == $ITEM_DYES                       Then Return False
-    If InArray($ModelID, $SPECIAL_DROPS)            Then Return False
+    If InArray($ModelID, $SPECIAL_DROPS_ARRAY)            Then Return False
     If InArray($ModelID, $ALL_TOMES_ARRAY)		    Then Return False ;Tomes
     If InArray($ModelID, $ALL_MATERIALS_ARRAY)		Then Return False ;Materials
-    If InArray($ModelID, $STACKABLE_TROPHIES_ARRAY)	Then Return False ;Trophies
+    If InArray($ModelID, $ALL_TROPHIES_ARRAY)	Then Return False ;Trophies
     If InArray($ModelID, $ALL_TITLE_ITEMS)			Then Return False ;Party, Alcohol, Sweet
     If InArray($ModelID, $ALL_SCROLLS_ARRAY)		Then Return False ;Scrolls
     If InArray($ModelID, $GENERAL_ITEMS_ARRAY)		Then Return False ;Lockpicks, Kits
