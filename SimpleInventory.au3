@@ -22,6 +22,7 @@
 #EndRegion About
 
 Global $BAGS_TO_USE = 4
+Global $USE_EXPERT_ID_KIT = True
 
 #Region Inventory
 Func Inventory()
@@ -166,7 +167,7 @@ Func Identify()
     For $i = 1 To $BAGS_TO_USE
         $bag = GetBag($i)
 		
-        If Not RetrieveIdentificationKit(False) Then Return
+        If Not RetrieveIdentificationKit($USE_EXPERT_ID_KIT) Then Return
         For $j = 1 To DllStructGetData($bag, "slots")
             $item = GetItemBySlot($i, $j)
             If DllStructGetData($item, "Id") == 0 Then ContinueLoop
@@ -215,7 +216,6 @@ Func CanSalvage($item)
     Local $ModelID = DllStructGetData($item, "ModelId")
     Local $rarity = GetRarity($item)
 
-    If DllStructGetData($item, 'Quantity') > 0 Then Return False
     If $rarity == $RARITY_GOLD			Then Return False
     If $rarity == $RARITY_BLUE			Then Return False
     If $rarity == $RARITY_PURPLE		Then Return False
