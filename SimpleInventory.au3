@@ -216,6 +216,8 @@ Func CanSalvage($item)
     Local $ModelID = DllStructGetData($item, "ModelId")
     Local $rarity = GetRarity($item)
 
+    If DllStructGetData($item, "Type") == $ITEM_TYPE_KEY Then Return False
+
     If $rarity == $RARITY_GOLD			Then Return False
     If $rarity == $RARITY_BLUE			Then Return False
     If $rarity == $RARITY_PURPLE		Then Return False
