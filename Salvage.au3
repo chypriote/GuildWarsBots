@@ -1,7 +1,7 @@
 #include <ComboConstants.au3>
 #include <GUIConstantsEx.au3>
 #include <GWA2.au3>
-#NoTrayIcon
+AUTOITSETOPTION("TrayIconDebug", 1)
 
 Opt("GUIOnEventMode", True)
 Opt("GUICloseOnESC", False)
@@ -194,7 +194,7 @@ EndFunc
 
 #Region GUI
 Func GUI()
-    $GUI = GUICreate("Identifier bot", 115, 90, -1, -1)
+    $GUI = GUICreate("Salvager bot", 115, 90, -1, -1)
     GUICtrlCreateLabel("Select character :", 5, 5, 105, 15)
     $CharInput = GUICtrlCreateCombo("", 5, 25, 105, 25, BitOR($CBS_DROPDOWN, $CBS_AUTOHSCROLL))
         GUICtrlSetData(-1, GetLoggedCharNames())
@@ -246,7 +246,7 @@ Func Salvage()
             If DllStructGetData($item, "ModelId") == $ITEM_FEATHERED_CREST Then SalvageCrests($item)
             If CanSalvage($item) Then
                 StartSalvage($item, True) ;noSleep
-                RndSleep(250)
+                RndSleep(1000)
                 SalvageMaterials()
                 RndSleep(750)
             EndIf
@@ -258,9 +258,9 @@ Func SalvageCrests($item)
     For $i = 0 to $q
         RetrieveSalvageKit()
         StartSalvage($item, True) ;noSleep
-        RndSleep(250)
+        RndSleep(1000)
         SalvageMaterials()
-        RndSleep(500)
+        RndSleep(750)
     Next
 EndFunc
 Func CanSalvage($item)
