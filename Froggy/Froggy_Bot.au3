@@ -16,167 +16,24 @@
 #include "GWA2_Headers.au3"
 #include "GWA2.au3"
 #include "AddsOn.au3"
-
-; Bogroot Growths Froggy Bot by LogicDoor
+#include "GUI.au3"
 
 Opt("GUIOnEventMode", 1)
 
-#Region ### START Koda GUI section ### Form=s
-Global $frmMain = GUICreate("Froggy v1.0 - By Archer", 390, 312, 200, 124)
-GUISetFont(9, 400, 0, "Arial")
-Global $edtLog = _GUICtrlRichEdit_Create($frmMain, "", 128, 47, 254, 130, BitOR($ES_MULTILINE, $WS_VSCROLL, $ES_READONLY))
-_GUICtrlRichEdit_SetFont($edtLog, 9, "Arial")
-_GUICtrlRichEdit_SetCharColor($edtLog, "65280")
-_GUICtrlRichEdit_SetText($edtLog, StringFormat("#########################\r\n\r\nFroggy Bot v0.1 By Archer. Enjoy\r\n\r\n#########################\r\n\r\n"))
-Global $inpInit = GUICtrlCreateInput('WinGetProcess("Guild Wars")', 200, 8, 156, 24)
-Global $btnStart = GUICtrlCreateButton("Start", 8, 8, 113, 25)
-
-Global $grpGeneralStats = GUICtrlCreateGroup("Settings", 8, 40, 110, 136)
-Global $Render  = GUICtrlCreateCheckbox("Render", 16, 56, 76, 17)
-GUICtrlSetOnEvent(-1, "ToggleRendering")
-GUICtrlSetFont($Render, 9, -1, 0, "Arial")
-
-Global $Purge  = GUICtrlCreateCheckbox("Purge",     16, 72, 70, 17)
-GUICtrlSetOnEvent(-1, "Purgehook")
-GUICtrlSetFont($Purge, 9, -1, 0, "Arial")
-
-Global $Use_Scrolls = GUICtrlCreateCheckbox("Scrolls", 16, 88, 70, 17)
-GUICtrlSetOnEvent(-1, "ToggleScrolls")
-GUICtrlSetFont($Use_Scrolls, 9, -1, 0, "Arial")
-
-Global $Use_Stones = GUICtrlCreateCheckbox("Stones", 16, 104, 80, 17)
-GUICtrlSetOnEvent(-1, "ToggleStones")
-GUICtrlSetFont($Use_Stones, 9, -1, 0, "Arial")
-
-Global $Open_Chests  = GUICtrlCreateCheckbox("Open Chests", 16, 120, 90, 17)
-GUICtrlSetOnEvent(-1, "ToggleOpenChests")
-GUICtrlSetFont($Open_Chests, 9, -1, 0, "Arial")
-
-Global $Store_Golds  = GUICtrlCreateCheckbox("Store Golds",      16, 136, 90, 17)
-GUICtrlSetOnEvent(-1, "ToggleStore")
-GUICtrlSetFont($Store_Golds, 9, -1, 0, "Arial")
-
-Global $Sell_Items   = GUICtrlCreateCheckbox("Auto-Sell",       16, 152, 70, 17)
-GUICtrlSetOnEvent(-1, "ToggleSell")
-GUICtrlSetFont($Sell_Items, 9, -1, 0, "Arial")
-GUICtrlCreateGroup("", -99, -99, 1, 1)
-
-Global $grpGeneralStats = GUICtrlCreateGroup("General Statistics", 8, 184, 182, 120)
-GUICtrlSetFont($grpGeneralStats, 9, 800, 0, "Arial")
-Global $lblRunNum = GUICtrlCreateLabel("Run Number:", 16, 200, 80, 20)
-GUICtrlSetFont($lblRunNum, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblRunNum, 0x0078D7)
-Global $lblRunNumData = GUICtrlCreateLabel("1", 120, 200, 64, 16, $SS_CENTER)
-GUICtrlSetFont($lblRunNumData, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblRunNumData, 0x0078D7)
-
-Global $lblDeldrimor = GUICtrlCreateLabel("Deldrimor:", 16, 216, 90, 20)
-GUICtrlSetFont($lblDeldrimor, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblDeldrimor, 0x0078D7)
-Global $lblDeldrimorData = GUICtrlCreateLabel("0", 120, 216, 64, 16, $SS_CENTER)
-GUICtrlSetFont($lblDeldrimorData, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblDeldrimorData, 0x0078D7)
-
-Global $lblAsura = GUICtrlCreateLabel("Asura Points:", 16, 232, 76, 20)
-GUICtrlSetFont($lblAsura, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblAsura, 0x0078D7)
-Global $lblAsuraData = GUICtrlCreateLabel("0", 120, 232, 64, 16, $SS_CENTER)
-GUICtrlSetFont($lblAsuraData, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblAsuraData, 0x0078D7)
-
-Global $lblLockpicks = GUICtrlCreateLabel("Lockpicks:", 16, 248, 76, 20)
-GUICtrlSetFont($lblLockpicks, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblLockpicks, 0x0078D7)
-Global $lblLockpicksData = GUICtrlCreateLabel("0", 120, 248, 64, 16, $SS_CENTER)
-GUICtrlSetFont($lblLockpicksData, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblLockpicksData, 0x0078D7)
-
-Global $lblCurrentRun = GUICtrlCreateLabel("Run Time:", 16, 264, 76, 20)
-GUICtrlSetFont($lblCurrentRun, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblCurrentRun, 0x0078D7)
-Global $lblCurrentRunData = GUICtrlCreateLabel("00:00:00", 120, 264, 64, 16, $SS_CENTER)
-GUICtrlSetFont($lblCurrentRunData, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblCurrentRunData, 0x0078D7)
-GUICtrlCreateGroup("", -99, -99, 1, 1)
-
-Global $lblTotalRun = GUICtrlCreateLabel("Total Run Time:", 16, 280, 96, 20)
-GUICtrlSetFont($lblTotalRun, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblTotalRun, 0x0078D7)
-Global $lblTotalRunData = GUICtrlCreateLabel("00:00:00", 120, 280, 64, 16, $SS_CENTER)
-GUICtrlSetFont($lblTotalRunData, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblTotalRunData, 0x0078D7)
-
-
-
-Global $grpDropStats = GUICtrlCreateGroup("Drop Statistics", 198, 184, 182, 120)
-GUICtrlSetFont($grpDropStats, 9, 800, 0, "Arial")
-
-Global $lblFroggy = GUICtrlCreateLabel("Froggies: ", 206, 200, 90, 20)
-GUICtrlSetFont($lblFroggy, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblFroggy, 0x808000)
-Global $lblFroggyData = GUICtrlCreateLabel("0", 310, 200, 64, 30, $SS_CENTER)
-GUICtrlSetFont($lblFroggyData, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblFroggyData, 0x808000)
-
-Global $lblGold = GUICtrlCreateLabel("Gold Items: ", 206, 216, 90, 20)
-GUICtrlSetFont($lblGold, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblGold, 0x808000)
-Global $lblGoldData = GUICtrlCreateLabel("0", 310, 216, 64, 30, $SS_CENTER)
-GUICtrlSetFont($lblGoldData, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblGoldData, 0x808000)
-
-Global $lblLockpicksDrop = GUICtrlCreateLabel("Lockpicks:", 206, 232, 76, 20)
-GUICtrlSetFont($lblLockpicksDrop, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblLockpicksDrop, 0x808000)
-Global $lblLockpicksDropData = GUICtrlCreateLabel("0", 310, 232, 64, 30, $SS_CENTER)
-GUICtrlSetFont($lblLockpicksDropData, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblLockpicksDropData, 0x808000)
-
-Global $lblChests = GUICtrlCreateLabel("Chests Opened:", 206, 248, 96, 20)
-GUICtrlSetFont($lblChests, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblChests, 0x808000)
-Global $lblChestsData = GUICtrlCreateLabel("0", 310, 248, 64, 23, $SS_CENTER)
-GUICtrlSetFont($lblChestsData, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblChestsData, 0x808000)
-
-Global $lblBlackDye = GUICtrlCreateLabel("Black Dye:", 206, 264, 96, 20)
-GUICtrlSetFont($lblBlackDye, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblBlackDye, 0x808000)
-Global $lblBlackDyeData = GUICtrlCreateLabel("0", 310, 264, 64, 23, $SS_CENTER)
-GUICtrlSetFont($lblBlackDyeData, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblBlackDyeData, 0x808000)
-
-Global $lblTomes = GUICtrlCreateLabel("Tomes: ", 206, 280, 90, 20)
-GUICtrlSetFont($lblTomes, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblTomes, 0x008000)
-Global $lblTomesData = GUICtrlCreateLabel("0", 310, 280, 64, 30, $SS_CENTER)
-GUICtrlSetFont($lblTomesData, 9, -1, 0, "Arial")
-GUICtrlSetColor($lblTomesData, 0x008000)
-
-
-GUICtrlCreateGroup("", -99, -99, 1, 1)
-Global $inpRuns = GUICtrlCreateInput("99", 136, 8, 49, 24, BitOR($GUI_SS_DEFAULT_INPUT,$ES_CENTER))
-GUISetState(@SW_SHOW)
-#EndRegion ### END Koda GUI section ###
-
-GUICtrlSetOnEvent($btnStart, "BotStartup")
-GUISetOnEvent($GUI_EVENT_CLOSE, "ExitBot")
-
-
 ; Globals
 Global Const $GuildWars = WinGetProcess("Guild Wars")
-Global Const $iGaddsEncampmentMapID = 638
-Global Const $iSplarkflyMapID = 558
-Global Const $iBogrootGrowthsLevel1MapID = 615
-Global Const $iBogrootGrowthsLevel2MapID = 616
+Global Const $GADDS_ENCAMPMENT = 638
+Global Const $SPARKFLY_SWAMP = 558
+Global Const $BOGROOT_GROWTH_LEVEL1 = 615
+Global Const $BOGROOT_GROWTH_LEVEL2 = 616
 Global Const $MAP_ID_BALTH_TEMPLE = 248
-Global Const $AsuranBuffArr[5] = [2434, 2435, 2436, 2481, 2548]
-Global Const $DwarvenBuffArr[9] = [2445, 2446, 2447, 2448, 2549, 2565, 2566, 2567, 2568]
-Global $bRunning = false
-Global $iCurrentRun = 0
-Global $bAsuraBlessing = false
-Global $bDwarvenBlessing = false
-Global $hTekksWar = 0x339
+Global Const $ASURAN_BUFFS[5] = [2434, 2435, 2436, 2481, 2548]
+Global Const $DWARVEN_BUFFS[9] = [2445, 2446, 2447, 2448, 2549, 2565, 2566, 2567, 2568]
+Global $IS_RUNNING = False
+Global $CURRENT_RUN = 0
+Global $RUN_FINISHED = False
+Global $bDwarvenBlessing = False
+Global $TEKKS_WAR = 0x339
 Global $TekksDialog = 0x833901
 Global $TekksComplete = 0x833907
 Global $iFroggyCount = 0
@@ -194,10 +51,7 @@ Global $coords[2]
 
 
 ; Config
-Global $nMinSleep = 60000 * 20 ; 20 Minutes
-Global $nMaxSleep = 60000 * 60 ; 60 Minutes
 Global $bGetKreweBuff = true
-Global $iRunNum = 99
 Global $RenderingEnabled = True
 Global $Ident = False
 Global $UseBags = 4 ; sets number of bags to be used
@@ -215,47 +69,38 @@ Func Main()
 	While 1
 		Sleep(100)
 
-		While $bRunning And $iCurrentRun < $iRunNum
+		While $IS_RUNNING
 			GUICtrlSetData($lblLockpicksData, GetPicksCount())
-			If $iCurrentRun = 0  And GetMapID() <> $iSplarkflyMapID And GetMapID() <> $iBogrootGrowthsLevel1MapID And GetMapID() <> $iBogrootGrowthsLevel2MapID = 616 Then
-				Setup()
-			EndIf
+			If $CURRENT_RUN == 0 And GetMapID() <> $SPARKFLY_SWAMP And GetMapID() <> $BOGROOT_GROWTH_LEVEL1 And GetMapID() <> $BOGROOT_GROWTH_LEVEL2 Then Setup()
 
-			$iCurrentRun += 1
-			GUICtrlSetData($lblRunNumData, $iCurrentRun)
+			$CURRENT_RUN += 1
+			GUICtrlSetData($lblRunNumData, $CURRENT_RUN)
 
 			$OpenedChestAgentIDs[0] = ""
 			ReDim $OpenedChestAgentIDs[1]
-			If GetMapID() = $iSplarkflyMapID then
-			   TakeQuest()
+			If GetMapID() == $SPARKFLY_SWAMP And Not $RUN_FINISHED Then TakeQuest()
+			If GetMapID() == $BOGROOT_GROWTH_LEVEL1 Then BogrootLvl1()
+			If GetMapID() == $BOGROOT_GROWTH_LEVEL2 Then 
+			   BogrootLvl2()
+			   Boss()
 			Endif
-			If GetMapID() = $iBogrootGrowthsLevel1MapID then
-			   BogrootLvl1 ()
-			Endif
-			If GetMapID() = $iBogrootGrowthsLevel2MapID then
-			   BogrootLvl2 ()
-			   Boss ()
-			Endif
+			If GetMapID() == $SPARKFLY_SWAMP And $RUN_FINISHED Then FinishWork()
 		Wend
 	Wend
 EndFunc
 
 Func Setup()
-   If $Sell_Items = True then
-	  ClearInventory() ; only clears inventory if less than 5 free slots
-   Endif
+   If $Sell_Items = True Then ClearInventory()
 
-   If GetMapID() <> $iGaddsEncampmentMapID Then
+   If GetMapID() <> $GADDS_ENCAMPMENT Then
 	  Out("Not at Gadds Encampment, Travelling.")
-	  TravelTo($iGaddsEncampmentMapID)
+	  TravelTo($GADDS_ENCAMPMENT)
    EndIf
 
-   AbandonQuest($hTekksWar)
-
+   AbandonQuest($TEKKS_WAR)
    BeforeRun()
    TakeAzuranBlessing()
    RunToBogroot()
-
 EndFunc
 
 Func BotStartup()
@@ -272,9 +117,6 @@ Func BotStartup()
 	EndIf
 
 	Global $aPlayerAgent = GetAgentByID(-2)
-
-	$iRunNum = GUICtrlRead($inpRuns)
-
 	Global $nTotalTime = TimerInit()
 	AdlibRegister("TotalTime", 1000)
 
@@ -284,55 +126,42 @@ Func BotStartup()
 	AdlibRegister("AsuraPoints", 1000)
 	AdlibRegister("DropCounts", 1000)
 	AdlibRegister("Lockpicks", 1000)
-;	GUICtrlSetData($lblLockpicksData, $iLockpicks)
-;	GUICtrlSetData($lblChestsData, $iChestCount)
+	;GUICtrlSetData($lblLockpicksData, $iLockpicks)
+	;GUICtrlSetData($lblChestsData, $iChestCount)
 
-	$bRunning = True
+	$IS_RUNNING = True
 EndFunc
 
 Func BeforeRun()
-
 	SwitchMode (2)
 	Out("Moving to Sparkfly")
 	MoveTo(-10018, -21892)
 	MoveTo(-9550, -20400)
-
 	TolSleep(500)
 
 	Do
-		Move(-9451, -19766)
-	Until WaitMapLoading($iSplarkflyMapID)
-
+		MoveTo(-9451, -19766)
+	Until WaitMapLoading($SPARKFLY_SWAMP)
 	Out("Loaded Sparkfly")
-EndFunc
+EndFunc ;BeforeRun
 
 Func TakeAzuranBlessing()
-	If $bGetKreweBuff Then
-		Out("Getting Asuran Blessing")
-		$aAsuraKrewe = GetNearestNPCToCoords(-9021, -19906)
-		GoToNPC($aAsuraKrewe)
-		TolSleep(500)
+	Out("Getting Asuran Blessing")
+	GoToNPC(GetNearestNPCToCoords(-9021, -19906))
+	TolSleep(200)
 
-		Do
-			TolSleep(200)
-			Dialog(0x84)
-			sleep(2000)
-			For $i = 0 to UBound($AsuranBuffArr) - 1
-				If IsDllStruct(GetEffect($AsuranBuffArr[$i])) Then
-					$bAsuraBlessing = True
-					Out("Asuran Blessing Received")
-					ExitLoop 2
-				EndIf
-			Next
-			Out("Unable To Get Asuran Blessing")
-			ExitLoop
-		Until $bAsuraBlessing
-	EndIf
-
-EndFunc
+	Dialog(0x84)
+	TolSleep(200)
+	For $i = 0 to UBound($ASURAN_BUFFS) - 1
+		If IsDllStruct(GetEffect($ASURAN_BUFFS[$i])) Then
+			Out("Asuran Blessing Received")
+			Return
+		EndIf
+	Next
+	Out("Unable To Get Asuran Blessing")
+EndFunc ;TakeAzuranBlessing
 
 Func RunToBogroot()
-
 	Out("Running To Bogroot")
 
 	Local $aWaypoints[16][4] = [ _
@@ -354,27 +183,25 @@ Func RunToBogroot()
 	[11874, 21508, 2000, "Simiam Group 3"]]
 
 	MoveandAggro($aWaypoints)
-EndFunc
+EndFunc ;RunToBogroot
 
 Func TakeQuest()
-
-	Global $nCurrentRunTime = TimerInit()
+	Global $START_TIME = TimerInit()
 	AdlibRegister("CurrentRunTime", 1000)
+	$RUN_FINISHED = False
 
 	TolSleep(2000)
 	MoveTo(12396, 22007)
 	Out("Taking Quest: Tekks")
-	$aTekks = GetNearestNPCToCoords(12561, 22614)
-	GoToNPC($aTekks)
+	GoToNPC(GetNearestNPCToCoords(12561, 22614)) ;Tekks
 
 	Do
 		TolSleep(500)
-		AcceptQuest($hTekksWar)
+		AcceptQuest($TEKKS_WAR)
 		Dialog($TekksDialog)
-	Until IsDllStruct(GetQuestByID($hTekksWar))
+	Until IsDllStruct(GetQuestByID($TEKKS_WAR))
 
-	Out("Starting Run Num: " & $iCurrentRun)
-
+	Out("Starting Run Num: " & $CURRENT_RUN)
     Out("Moving to Bogroot Portal.")
 
 	MoveTo(11197, 23820)
@@ -382,15 +209,11 @@ Func TakeQuest()
 	MoveTo(12968, 26219)
 	Do
 		Move(13097, 26393)
-
-	Until WaitMapLoading($iBogrootGrowthsLevel1MapID)
-
+	Until WaitMapLoading($BOGROOT_GROWTH_LEVEL1)
 	TolSleep(3000)
+EndFunc ;TakeQuest
 
-EndFunc
-
-Func BogrootLvl1 ()
-
+Func BogrootLvl1()
 	Out("Aggro Frog Fight")
 	MoveTo(17026, 2168)
 	AggroMoveToEx(18092, 4590)
@@ -424,17 +247,15 @@ Func BogrootLvl1 ()
 	[4941, -16181, 2000, "Nettle Spores"], _
 	[7360, -17361, 2000, "Moving to Level 2 Portal"], _
 	[7552, -18776, 2000, "Moving to Level 2 Portal"]]
-
 	MoveandAggro($aWaypointsLevel1)
 
 	Out("Travelling to Bogroot Growths - Level 2.")
 	Do
 		Move(7665, -19050)
-	Until WaitMapLoading($iBogrootGrowthsLevel2MapID)
+	Until WaitMapLoading($BOGROOT_GROWTH_LEVEL2)
+Endfunc ;BogrootLvl1
 
-Endfunc
-
-Func BogrootLvl2 ()
+Func BogrootLvl2()
 	Out("Clearing Spawn")
 	AggroMoveToEx(-11330, -5483)
 
@@ -487,9 +308,8 @@ Func BogrootLvl2 ()
 	Out("Open Dungeon Door")
 	$BossLock = GetNearestSignpostToCoords(17804, -6157)
 	GoToSignpost($BossLock)
-EndFunc
+EndFunc ;BogrootLvl2
 
-	; Boss
 Func Boss()
 	Local $aWaypointsBoss[9][4] = [ _
 	[18334, -8838, 2000, "Moving to Boss"], _
@@ -512,52 +332,46 @@ Func Boss()
 
 	  Sleep(2000)
 
-	  Out("Accepting Quest Reward")
-	  Do
-		 $Tekks = GetNearestNPCToCoords(14618, -17828)
-		 GoNPC($Tekks)
-		 TolSleep(1000)
-		 Dialog($TekksComplete)
-	  Until Not IsDllStruct(GetQuestByID($hTekksWar))
-
-	  TolSleep(800)
-
 	  Out("Bogroot Chest")
 	  MoveTo(14876, -19033)
-	  $BogrootChest = GetNearestSignpostToCoords(14876, -19033)
-	  GoToSignpost($BogrootChest)
+	  GoToSignpost(GetNearestSignpostToCoords(14876, -19033))
 	  TolSleep(5000)
 	  Out("Pick Up Drops")
 	  PickupLootEx(6000)
+	  $RUN_FINISHED = True
    EndIf
-
-   If $Sell_Items = True then
-	  ClearInventory() ; only clears inventory if less than 5 free slots
-   Endif
    Out("Wait for Reload")
    Do
 	 Sleep(200)
-   Until WaitMapLoading($iSplarkflyMapID)
+   Until WaitMapLoading($SPARKFLY_SWAMP)
+EndFunc ;Boss
 
-   AdlibUnregister("CurrentRunTime")
-
-   TolSleep(3000)
-
-EndFunc
+Func FinishWork()
+	Out("Accepting Quest Reward")
+	Do
+	   GoNPC($GetNearestNPCToCoords(14618, -17828))
+	   TolSleep(1000)
+	   Dialog($TekksComplete)
+	Until Not IsDllStruct(GetQuestByID($TEKKS_WAR))
+	TolSleep(800)
+ 
+	If $Sell_Items = True Then ClearInventory()
+	AdlibUnregister("CurrentRunTime")
+	TolSleep(3000)
+EndFunc ;FinishWork
 
 Func Out($sMessage)
 	ConsoleWrite($sMessage & @CRLF)
 	_GUICtrlRichEdit_SetFont($edtLog, 8, "Trebuchet MS")
 	_GUICtrlRichEdit_AppendText($edtLog, $sMessage & @CRLF)
 	_GUICtrlEdit_Scroll($edtLog, $SB_SCROLLCARET)
-EndFunc
+EndFunc ;Out
 
 Func MoveandAggro($aWaypoints)
-	$iStart = 0
-	$iFinish = UBound($aWaypoints) - 1
-	$iStep = 1
+	Local $iFinish = UBound($aWaypoints) - 1
+	Local $iStep = 1
 
-	For $i = $iStart to $iFinish step $iStep
+	For $i = 0 to $iFinish step $iStep
 		Out("Moving to waypoint - " &  $aWaypoints[$i][3])
 		Local $nWaypointX = $aWaypoints[$i][0]
 		Local $nWaypointY = $aWaypoints[$i][1]
@@ -565,28 +379,23 @@ Func MoveandAggro($aWaypoints)
 
 		AggroMoveToEx($nWaypointX, $nWaypointY, $nRange)
 	Next
-EndFunc
+EndFunc ;MoveandAggro
 
 Func GetDwarvenBlessing($iX, $iY)
 	$aBeaconofDroknar = GetNearestNPCToCoords($iX, $iY)
 	GoToNPC($aBeaconofDroknar)
 	TolSleep(500)
 
-	Do
-		TolSleep(200)
-		Dialog(0x84)
-		sleep(2000)
-		For $i = 0 to UBound($DwarvenBuffArr) - 1
-			If IsDllStruct(GetEffect($DwarvenBuffArr[$i])) Then
-				$bDwarvenBlessing = True
-				Out("Dwarven Blessing Received")
-				ExitLoop 2
-			EndIf
-		Next
-		Out("Unable To Get Dwarven Blessing")
-		ExitLoop
-	Until $bDwarvenBlessing
-EndFunc
+	Dialog(0x84)
+	TolSleep(200)
+	For $i = 0 to UBound($DWARVEN_BUFFS) - 1
+		If IsDllStruct(GetEffect($DWARVEN_BUFFS[$i])) Then
+			Out("Dwarven Blessing Received")
+			Return
+		EndIf
+	Next
+	Out("Unable To Get Dwarven Blessing")
+EndFunc ;GetDwarvenBlessing
 
 Func PickupLootEx($iMaxDist = 3000, $bCanPickup = True)
 	$lMe = GetAgentByID(-2)
@@ -610,7 +419,7 @@ Func PickupLootEx($iMaxDist = 3000, $bCanPickup = True)
 			Wend
 		EndIf
 	Next
-EndFunc
+EndFunc ;PickupLootEx
 
 Func CanPickUpEx($aItem, $bCanPickup)
 	If Not $bCanPickup Then Return True
@@ -638,18 +447,15 @@ Func CanPickUpEx($aItem, $bCanPickup)
 		Case 10 ; Black dye (use 146 for all dyes)
 			$iBlackDyeCount += 1
 			Return True
-;		Case 2511 ; Gold/Plat
-;			$aAmount = DllStructGetData($aItem, 'Value')
-;			If GetGoldCharacter() + $aAmount > 100000 Then
-;				Return False
-;			Else
-;				Return True
-;			EndIf
+		Case 2511 ; Gold/Plats
+			Return GetGoldCharacter() + DllStructGetData($aItem, 'Value') < 100000
 		Case 3256, 3746, 5594, 5595, 5611, 21233, 22279, 22280 ; Scrolls
 		    $iScrollCount += 1
 			Return True
-		 Case 21786, 21787, 21788, 21789, 21790, 21791, 21792, 21793, 21794, 21795, 21796, 21797, 21798, 21799, 21800, 21801, 21802, 21803, 21804, 21805 ; Tomes
+		Case 21786, 21787, 21788, 21789, 21790, 21791, 21792, 21793, 21794, 21795, 21796, 21797, 21798, 21799, 21800, 21801, 21802, 21803, 21804, 21805 ; Tomes
 			$iTomeCount += 1
+			Return True
+		Case 28435, 28436: ;Cider and Pie
 			Return True
 ;		Case 30855 ; Bottle of Grog
 ;			Return True
@@ -678,9 +484,7 @@ Func AggroMoveToEx($x, $y, $z = 900) ;Reduced from 2000
    $coords[0] = DllStructGetData($Me, 'X')
    $coords[1] = DllStructGetData($Me, 'Y')
 
-  If $Open_Chests = True Then  ; tests if chests was checked
-	   CheckForChest()
-  EndIf
+  If $Open_Chests = True Then CheckForChest()
 
    Do
 	  RndSleep(250)
@@ -711,9 +515,7 @@ Func AggroMoveToEx($x, $y, $z = 900) ;Reduced from 2000
 		 Move($x, $y)
 	  EndIf
    Until ComputeDistance($coords[0], $coords[1], $x, $y) < 250 OR $iBlocked > 20
-	  If $Open_Chests = True Then
-		 CheckForChest()
-      EndIf
+	  If $Open_Chests = True Then CheckForChest()
 	  PickuplootEX()
 EndFunc
 
@@ -775,7 +577,7 @@ Func Fight($x)
 		$target = GetNearestEnemyToAgent(-2)
 		$distance = ComputeDistance(DllStructGetData($target, 'X'),DllStructGetData($target, 'Y'),DllStructGetData(GetAgentByID(-2), 'X'),DllStructGetData(GetAgentByID(-2), 'Y'))
 	Until DllStructGetData($target, 'ID') = 0 OR $distance > $x
-	If CountFreeSlots() = 0 then
+	If CountFreeSlots() = 0 Then
 		Out("Inventory full")
 	Else
 		Out("Pickup Loot")
@@ -879,7 +681,7 @@ Func CheckForChest()
 	Local $AgentArray, $lAgent, $lExtraType
 	Local $ChestFound = False
 	Local $lLockPicksBefore = GUICtrlRead($lblLockpicksData)
-;	If $lLockPicksBefore == 0 Then Return
+	;If $lLockPicksBefore == 0 Then Return
 	If GetIsDead(-2) Then Return
 
 	$AgentArray = GetAgentArraySorted(0x200)	;0x200 = type: static
@@ -933,20 +735,14 @@ EndFunc   ;==>GetAgentArraySorted
 
 
 Func ToggleScrolls()
-   If $Use_Scrolls = True Then
-	  $Use_Scrolls = False
-   Else
-	  if $Use_Scrolls = False then
-		 $Use_Scrolls = True
-	  Endif
-   EndIf
+	$Use_Scrolls = Not $Use_Scrolls
 EndFunc   ;==>ToggleScrolls
 
 Func ToggleStones()
    If $Use_Stones = True Then
 	  $Use_Stones = False
    Else
-	  if $Use_Stones = False then
+	  if $Use_Stones = False Then
 		 $Use_Stones = True
 	  Endif
    EndIf
@@ -969,7 +765,7 @@ Func ToggleOpenChests()
    If $Open_Chests = True Then
 	  $Open_Chests = False
    Else
-	  if $Open_Chests = False then
+	  if $Open_Chests = False Then
 		 $Open_Chests = True
 	  Endif
    EndIf
@@ -979,7 +775,7 @@ Func ToggleStore()
    If $Store_Golds = True Then
 	  $Store_Golds = False
    Else
-	  if $Store_Golds = False then
+	  if $Store_Golds = False Then
 		 $Store_Golds = True
 	  Endif
    EndIf
@@ -989,7 +785,7 @@ Func ToggleSell()
    If $Sell_Items = True Then
 	  $Sell_Items = False
    Else
-	  if $Sell_Items = False then
+	  if $Sell_Items = False Then
 		 $Sell_Items = True
 	  Endif
    EndIf
@@ -1015,7 +811,7 @@ EndFunc
 
 Func CurrentRunTime()
 	Local $g_iSecs, $g_iMins, $g_iHour
-	_TicksToTime(Int(TimerDiff($nCurrentRunTime)), $g_iHour, $g_iMins, $g_iSecs)
+	_TicksToTime(Int(TimerDiff($START_TIME)), $g_iHour, $g_iMins, $g_iSecs)
 	Local $sTime = StringFormat("%02i:%02i:%02i", $g_iHour, $g_iMins, $g_iSecs)
 	GuiCtrlSetData($lblCurrentRunData, $sTime)
 EndFunc
@@ -1074,7 +870,7 @@ Func SkillSleep($nSkillID)
 	$aSkill = GetSkillByID($nSkillID)
 	$nActivationTime = DllStructGetData($aSkill, 'Activation') * 1000
 	Sleep($nActivationTime + 100)
- EndFunc
+EndFunc
 
 Func UseScroll() ;Uses scroll if in inventory based on GUI checkbox
 	If $Use_Scrolls = True Then
@@ -1126,128 +922,128 @@ EndFunc
 
 Func UseStones() ;Uses summoning stone if in inventory based on GUI checkbox
 
-  If $Use_Stones = True Then
-	  $item = GetItemByModelID(37810)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Legionnaire Summoning Crystal")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(31156)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Zaischen Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(30846)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Automaton Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(30959)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Chitinous Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(30961)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Amber Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(30962)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Artic Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(30963)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Demonic Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(30964)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Geletinous Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(30965)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Fossilized Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(30966)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Jadeite Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(31022)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Mischievous Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(31023)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Frosty Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(32557)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Ghastly Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(34176)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Celestial Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(30960)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Mystical Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(31155)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Mysterious Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-;	  $item = GetItemByModelID(35126)                        ;the ID seems to be incorrect as this is activated even when non exists
-;	  If (DllStructGetData($item, 'Bag') <> 0) Then
-;		 Out("Using Shining Blade Summoning Stone")
-;		 UseItem($item)
-;		 Return
-;	  EndIf
-	  $item = GetItemByModelID(30210)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Imperial Guard Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(30209)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Tengu Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  $item = GetItemByModelID(21154)
-	  If (DllStructGetData($item, 'Bag') <> 0) Then
-		 Out("Using Merchant Summoning Stone")
-		 UseItem($item)
-		 Return
-	  EndIf
-	  Out("No summoning stones found")
-   EndIf
+	If $Use_Stones = True Then
+		$item = GetItemByModelID(37810)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Legionnaire Summoning Crystal")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(31156)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Zaischen Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(30846)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Automaton Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(30959)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Chitinous Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(30961)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Amber Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(30962)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Artic Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(30963)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Demonic Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(30964)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Geletinous Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(30965)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Fossilized Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(30966)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Jadeite Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(31022)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Mischievous Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(31023)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Frosty Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(32557)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Ghastly Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(34176)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Celestial Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(30960)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Mystical Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(31155)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Mysterious Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(35126)                        ;the ID seems to be incorrect as this is activated even when non exists
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Shining Blade Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(30210)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Imperial Guard Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(30209)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Tengu Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		$item = GetItemByModelID(21154)
+		If (DllStructGetData($item, 'Bag') <> 0) Then
+			Out("Using Merchant Summoning Stone")
+			UseItem($item)
+			Return
+		EndIf
+		Out("No summoning stones found")
+	EndIf
 EndFunc
 

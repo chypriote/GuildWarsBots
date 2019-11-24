@@ -297,7 +297,7 @@ Func CanSell($item)
     If $ModelID == 925 Then Return True ;Cloth
     If $ModelID == 940 Then Return True ;Tanned
     If $ModelID == 953 Then Return True ;Scales
-    If $ModelID == $MAT_BONES Then Return False ;Bones
+    If $ModelID == $MAT_BONES Then Return True ;Bones
     If $ModelID == $ITEM_FEATHERED_CREST Then Return False
     If InArray($ModelID, $SPECIAL_DROPS_ARRAY)      Then Return False
     If InArray($ModelID, $ALL_TOMES_ARRAY)		  	Then Return False ;Tomes
