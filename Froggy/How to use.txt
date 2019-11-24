@@ -1,0 +1,80 @@
+The bot is designed to farm frog scepters while maximizing the following titles:
+- Asura
+- Deldrimor
+- Wisdom
+- Lucky
+- Unlucky
+- Treasure Hunter
+
+You: 
+	Rit (S0S)		OACiIykMdNlLWO5D2JWNxMNACA  (replace "fight" with "fight_rit on row 696)
+	Other Professions (SoS)	OACjAyiM5QXT5ilTMTRbVT+gDgA (this is a rit bar but can be used it on any prof)
+Heroes:
+	Nec (Pod)		OAljYkHsZOP1qqdQoZJKD14dMA
+	Nec (MM)		OAljUwGopSyBVVUBHVKgbh1Y7YA		
+	Nec (BiP Healer)	OAhjQoGYIP3hq6QbcOMncSThHA
+	Mesmer (Panic)		OQhkAgBqAHKDNY6lDMdDh88K4iB
+	Mesmer (Ineptitude)	OQhjAYBc4SvAkA5ZIgDTSTTOXMA
+	Mesmer 3 (E-Surge)	OQhkAkBpAHO0Jw0TOgpzQQeGC4FA
+	Rit (ST)		OACjAyhDJPYTrX48xBNtmOzkLA		
+
+	
+Time Run: 35-40 minutes in HM depending on spawns, chests, etc.
+
+Instructions:
+-Download and extract Froggy.zip
+-Clean out bags 1, 2, 3 and 4 of any gold weapons with req >9 that you want to keep (see below for "auto-sell"); you can change the number of bags to be used on row 203 of the script (Global $UseBags = 4)
+-Log on to any char.
+-Double click on Froggy_Bot.au3
+
+Note: 
+- The bot uses a generic fight function that can accept bars from different professions; If you are using the SoS ritualist bar above, I recommend using the Fight_Rit function instead, as it will perform better.
+- The bot will pick up gold items, diamond/onyx, black dye, lockpicks, scrolls and tomes
+- When "Scrolls" is ticked, the bot will attempt to use scroll in decreasing order of XP gain granted
+- When "Stones" is ticked, the bot will attempt to use a summoning stone in the following order of priority:
+	1. Legionnaire Summoning Crystal
+	2. Zaischen Summoning Stone
+	3. Automaton Summoning Stone
+	4. Chitinous Summoning Stone
+	5. Amber Summoning Stone
+	6. Artic Summoning Stone
+	7. Demonic Stone
+	8. Geletinous Summoning Stone
+	9. Fossilized Summoning Stone
+	10. Jadeite Summoning Stone
+	11. Mischievous Summoning Stone
+	12. Frosty Summoning Stone
+	13. Ghastly Summoning Stone
+	14. Celestial Summoning Stone
+	15. Mystical Summoning Stone
+	16. Mysterious Summoning Stone
+	17. Shining Blade Summoning Stone
+	18. Imperial Guard Summoning Stone
+	19. Tengu Summoning Stone
+	20. Merchant Summoning Stone
+- Open Chests - The bot will open every chest it finds; it will not buy new lockpicks
+- Store Golds - The bot will attempt to store Gold items before any selling occurs
+- Auto-Sell - The bot will:
+	1. identify all items in the inventory on the spot
+	2. When fewer than 8 slots remain in the allowed bags, identify and sell at the start of the next run
+	
+	Note: the bot will not auto-sell the following items (even if in the allowed bags):
+		1. Gold items with req 9
+		2. Froggies with req 12 or less
+		2. Dies and Lockpicks
+		3. ID and Salvage Kits
+		4. Stackable items (materials, consumables, stones, tomes)
+		5. Weapon mods you have salvaged (edit which on row 
+
+	3. The bot will salvage expensive runes and inscriptions before selling, as follows:
+		Superior Runes: 
+		Fast Casting, Domination Magic, Channeling Magic, 
+		Communing, Earth Prayers, Death, Vigor
+		Other: Major Vigor, Clarity, Restoration, Vitae
+		
+		Insignas: 
+		Survivor, Radiant, Blessed Insignia, Sentinel's [Warrior],
+		Bloodstained [Necromancer], Prodigy's [Mesmer], Nightstalker's [Assassin], 
+		Shaman's [Ritualist], Windwalker [Dervish], Centurion's [Paragon]
+
+
