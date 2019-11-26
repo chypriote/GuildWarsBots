@@ -31,7 +31,6 @@ Global Const $ASURAN_BUFFS[5] = [2434, 2435, 2436, 2481, 2548]
 Global Const $DWARVEN_BUFFS[9] = [2445, 2446, 2447, 2448, 2549, 2565, 2566, 2567, 2568]
 Global $IS_RUNNING = False
 Global $CURRENT_RUN = 0
-Global $RUN_FINISHED = False
 Global $bDwarvenBlessing = False
 Global $TEKKS_WAR = 0x339
 Global $TekksDialog = 0x833901
@@ -78,13 +77,12 @@ Func Main()
 
 			$OpenedChestAgentIDs[0] = ""
 			ReDim $OpenedChestAgentIDs[1]
-			If GetMapID() == $SPARKFLY_SWAMP And Not $RUN_FINISHED Then TakeQuest()
+			If GetMapID() == $SPARKFLY_SWAMP Then TakeQuest()
 			If GetMapID() == $BOGROOT_GROWTH_LEVEL1 Then BogrootLvl1()
 			If GetMapID() == $BOGROOT_GROWTH_LEVEL2 Then 
 			   BogrootLvl2()
 			   Boss()
 			Endif
-			If GetMapID() == $SPARKFLY_SWAMP And $RUN_FINISHED Then FinishWork()
 		Wend
 	Wend
 EndFunc
@@ -133,7 +131,7 @@ Func BotStartup()
 EndFunc
 
 Func BeforeRun()
-	SwitchMode (2)
+	SwitchMode(1)
 	Out("Moving to Sparkfly")
 	MoveTo(-10018, -21892)
 	MoveTo(-9550, -20400)
@@ -188,7 +186,6 @@ EndFunc ;RunToBogroot
 Func TakeQuest()
 	Global $START_TIME = TimerInit()
 	AdlibRegister("CurrentRunTime", 1000)
-	$RUN_FINISHED = False
 
 	TolSleep(2000)
 	MoveTo(12396, 22007)
@@ -324,50 +321,38 @@ Func Boss()
 
     UseScroll()
 	MoveandAggro($aWaypointsBoss)
+	Out("Boss Group Dead")
 
 	$NearestEnemy = GetNearestEnemyToAgent($aPlayerAgent)
 	$NearestDistance = @extended
 	If $NearestDistance > 3000 Then
-	  Out("Boss Group Dead")
-
-	  Sleep(2000)
-
-	  Out("Bogroot Chest")
-	  MoveTo(14876, -19033)
-	  GoToSignpost(GetNearestSignpostToCoords(14876, -19033))
-	  TolSleep(5000)
-	  Out("Pick Up Drops")
-	  PickupLootEx(6000)
-	  $RUN_FINISHED = True
-   EndIf
-   Out("Accepting Quest Reward")
-   Do
-	  GoNPC(GetNearestNPCToCoords(13975, -17211))
-	  TolSleep(1000)
-	  Dialog($TekksComplete)
-   Until Not IsDllStruct(GetQuestByID($TEKKS_WAR))
-   TolSleep(800)
-   Out("Wait for Reload")
-   Do
-	 Sleep(200)
-   Until WaitMapLoading($SPARKFLY_SWAMP)
-EndFunc ;Boss
-
-Func FinishWork()
-	If DllStructGetData(GetQuestByID($TEKKS_WAR), 'ID') <> 0 Then
-		Out("Accepting Quest Reward")
-		Do
-		   GoNPC(GetNearestNPCToCoords(14618, -17828))
-		   TolSleep(1000)
-		   Dialog($TekksComplete)
-		Until Not IsDllStruct(GetQuestByID($TEKKS_WAR))
-		TolSleep(800)
+		Sleep(2000)
+		Out("Bogroot Chest")
+		MoveTo(14876, -19033)
+		GoToSignpost(GetNearestSignpostToCoords(14876, -19033))
+		TolSleep(4000)
+		Out("Pick Up Drops")
+		PickupLootEx(6000)
 	EndIf
- 
+
+	Out("Accepting Quest Reward")
+	Local $deadlock = 0
+	Do
+		GoNPC(GetNearestNPCToCoords(13975, -17211))
+		TolSleep(500)
+		Dialog($TekksComplete)
+		$dealock += 1
+	Until Not IsDllStruct(GetQuestByID($TEKKS_WAR)) Or $deadlock == 50
+	If IsDllStruct(GetQuestByID($TEKKS_WAR)) Then AbandonQuest($TEKKS_WAR)
+	Out("Wait for Reload")
+
+	Do
+		Sleep(200)
+	Until WaitMapLoading($SPARKFLY_SWAMP)
 	If $Sell_Items = True Then ClearInventory()
 	AdlibUnregister("CurrentRunTime")
 	TolSleep(3000)
-EndFunc ;FinishWork
+EndFunc ;Boss
 
 Func Out($sMessage)
 	ConsoleWrite($sMessage & @CRLF)
