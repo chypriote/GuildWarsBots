@@ -55,11 +55,11 @@ Global $bGetKreweBuff = true
 Global $RenderingEnabled = True
 Global $Ident = False
 Global $UseBags = 4 ; sets number of bags to be used
-Global $Sell_Items = False
-Global $Open_Chests = False
+Global $Sell_Items = True
+Global $Open_Chests = True
 Global $Use_Scrolls = False
 Global $Use_Stones = False
-Global $Store_Golds = False
+Global $Store_Golds = True
 Global $Purge = False
 
 Main()
@@ -340,6 +340,13 @@ Func Boss()
 	  PickupLootEx(6000)
 	  $RUN_FINISHED = True
    EndIf
+   Out("Accepting Quest Reward")
+   Do
+	  GoNPC(GetNearestNPCToCoords(13975, -17211))
+	  TolSleep(1000)
+	  Dialog($TekksComplete)
+   Until Not IsDllStruct(GetQuestByID($TEKKS_WAR))
+   TolSleep(800)
    Out("Wait for Reload")
    Do
 	 Sleep(200)
@@ -347,13 +354,15 @@ Func Boss()
 EndFunc ;Boss
 
 Func FinishWork()
-	Out("Accepting Quest Reward")
-	Do
-	   GoNPC($GetNearestNPCToCoords(14618, -17828))
-	   TolSleep(1000)
-	   Dialog($TekksComplete)
-	Until Not IsDllStruct(GetQuestByID($TEKKS_WAR))
-	TolSleep(800)
+	If DllStructGetData(GetQuestByID($TEKKS_WAR), 'ID') <> 0 Then
+		Out("Accepting Quest Reward")
+		Do
+		   GoNPC(GetNearestNPCToCoords(14618, -17828))
+		   TolSleep(1000)
+		   Dialog($TekksComplete)
+		Until Not IsDllStruct(GetQuestByID($TEKKS_WAR))
+		TolSleep(800)
+	EndIf
  
 	If $Sell_Items = True Then ClearInventory()
 	AdlibUnregister("CurrentRunTime")
