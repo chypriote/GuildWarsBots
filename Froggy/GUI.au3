@@ -139,3 +139,96 @@ GUISetState(@SW_SHOW)
 
 GUICtrlSetOnEvent($btnStart, "BotStartup")
 GUISetOnEvent($GUI_EVENT_CLOSE, "ExitBot")
+
+#Region Toggles
+Func ToggleScrolls()
+	$Use_Scrolls = Not $Use_Scrolls
+EndFunc ;ToggleScrolls
+
+Func ToggleStones()
+	$Use_Stones = Not $Use_Stones
+EndFunc ;ToggleStones
+
+
+Func ToggleRendering()
+	$RenderingEnabled = Not $RenderingEnabled
+	If $RenderingEnabled Then
+		EnableRendering()
+		WinSetState(GetWindowHandle(), "", @SW_SHOW)
+	Else
+		DisableRendering()
+		WinSetState(GetWindowHandle(), "", @SW_HIDE)
+		ClearMemory()
+	EndIf
+EndFunc ;ToggleRendering
+
+Func ToggleOpenChests()
+	$Open_Chests = Not $Open_Chests
+EndFunc ;ToggleOpenChests
+
+Func ToggleStore()
+	$Store_Golds = Not $Store_Golds
+EndFunc ;==>ToggleIdent and identifies bags
+
+Func ToggleSell()
+	$Sell_Items = Not $Sell_Items
+EndFunc ;==> ToggleSellItems
+
+Func Purgehook()
+	Out("PurgeHook")
+	Enablerendering()
+	Sleep(3000)
+	Disablerendering()
+Endfunc
+#EndRegion
+
+#Region Infos
+Func TotalTime()
+	Local $g_iSecs, $g_iMins, $g_iHour
+	_TicksToTime(Int(TimerDiff($nTotalTime)), $g_iHour, $g_iMins, $g_iSecs)
+	Local $sTime = StringFormat("%02i:%02i:%02i", $g_iHour, $g_iMins, $g_iSecs)
+	GuiCtrlSetData($lblTotalRunData, $sTime)
+EndFunc
+
+Func CurrentRunTime()
+	Local $g_iSecs, $g_iMins, $g_iHour
+	_TicksToTime(Int(TimerDiff($START_TIME)), $g_iHour, $g_iMins, $g_iSecs)
+	Local $sTime = StringFormat("%02i:%02i:%02i", $g_iHour, $g_iMins, $g_iSecs)
+	GuiCtrlSetData($lblCurrentRunData, $sTime)
+EndFunc
+
+Func DeldrimorPoints()
+	Local $iCurrentDeldrimorTitle = GetDeldrimorTitle()
+	$iCalcPoints = $iCurrentDeldrimorTitle - $iDeldrimorTitle
+	GUICtrlSetData($lblDeldrimorData, int($iCalcPoints))
+EndFunc
+
+Func AsuraPoints()
+	Local $iCurrentAsuraTitle = GetAsuraTitle()
+	$iCalcPoints = $iCurrentAsuraTitle - $iAsuraTitle
+	GUICtrlSetData($lblAsuraData, int($iCalcPoints))
+EndFunc
+
+Func Lockpicks()
+	Local $TotalPicksCount = GetPicksCount()
+	GUICtrlSetData($lblLockpicksData, $TotalPicksCount)
+EndFunc
+
+Func DropCounts()
+	GUICtrlSetData($lblFroggyData, $iFroggyCount)
+	GUICtrlSetData($lblGoldData, $iGoldCount)
+	GUICtrlSetData($lblLockpicksDropData, $iLockpickCount)
+	GUICtrlSetData($lblChestsData, $iChestCount)
+	GUICtrlSetData($lblBlackDyeData, $iBlackDyeCount)
+	GUICtrlSetData($lblTomesData, $iTomeCount)
+EndFunc
+
+Func ExitBot()
+	AdlibUnRegister("TotalTime")
+	AdlibUnRegister("DeldrimorPoints")
+	AdlibUnRegister("AsuraPoints")
+	AdlibUnRegister("Lockpicks")
+	AdlibUnRegister("DropCounts")
+	Exit
+EndFunc
+#EndRegion
