@@ -3462,7 +3462,7 @@ Func WaitMapLoading($aMapID = 0, $aDeadlock = 15000)
     Until $lMapLoading <> 2 And GetMapIsLoaded() And (GetMapID() == $aMapID Or $aMapID == 0)
     RndSleep(500)
 
-    Return GetMapID() == $aMapID 
+    Return True
 EndFunc   ;==>WaitMapLoading
 
 ;~ Description: Returns quest struct.

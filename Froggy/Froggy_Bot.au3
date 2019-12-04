@@ -341,7 +341,7 @@ Func Boss()
 		GoNPC(GetNearestNPCToCoords(13975, -17211))
 		TolSleep(500)
 		Dialog($TekksComplete)
-		$dealock += 1
+		$deadlock += 1
 	Until Not IsDllStruct(GetQuestByID($TEKKS_WAR)) Or $deadlock == 50
 	If IsDllStruct(GetQuestByID($TEKKS_WAR)) Then AbandonQuest($TEKKS_WAR)
 	Out("Wait for Reload")
@@ -667,7 +667,7 @@ Func GetPartyHealth()
 EndFunc
 
  Func GetChecked($GUICtrl)
-	Return (GUICtrlRead($GUICtrl)==$GUI_Checked)
+	Return (GUICtrlRead($GUICtrl) == $GUI_Checked)
  EndFunc
 
 

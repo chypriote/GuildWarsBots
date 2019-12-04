@@ -72,11 +72,11 @@ EndFunc
 #Region Identification
 Func Identify()
     Local $item, $bag
-    
-    RetrieveIdentificationKit()
+	
     For $i = 1 To $BAGS_TO_USE
         $bag = GetBag($i)
-        
+		
+        If Not RetrieveIdentificationKit($USE_EXPERT_ID_KIT) Then Return
         For $j = 1 To DllStructGetData($bag, "slots")
             $item = GetItemBySlot($i, $j)
             If DllStructGetData($item, "Id") == 0 Then ContinueLoop
@@ -84,7 +84,7 @@ Func Identify()
         Next
     Next
 EndFunc ;Identify
-Func RetrieveIdentificationKit()
+Func RetrieveIdentificationKit($expert = True)
     If FindIdentificationKit() = 0 Then
         If GetGoldCharacter() < 500 And GetGoldStorage() > 499 Then
             WithdrawGold(500)
@@ -92,11 +92,11 @@ Func RetrieveIdentificationKit()
         EndIf
         Local $j = 0
         Do
-            BuySuperiorIdentificationKit()
+            $expert ? BuySuperiorIdentificationKit() : BuyIdentificationKit()
             RndSleep(500)
             $j = $j + 1
         Until FindIdentificationKit() <> 0 Or $j = 3
-        If $j = 3 Then Exit
+        If $j = 3 Then Return False
         RndSleep(500)
     EndIf
 EndFunc ;RetrieveIdentificationKit

@@ -240,7 +240,7 @@ Func Salvage()
     For $i = 1 To $BAGS_TO_USE
         $bag = Getbag($i)
 
-        RetrieveSalvageKit()
+        If Not RetrieveSalvageKit() Then Return
         For $j = 1 To DllStructGetData($bag, 'Slots')
             $item = GetItemBySlot($i, $j)
             If DllStructGetData($item, "ModelId") == $ITEM_FEATHERED_CREST Then SalvageCrests($item)
@@ -266,17 +266,18 @@ EndFunc
 Func CanSalvage($item)
     Local $ModelID = DllStructGetData($item, "ModelId")
     Local $rarity = GetRarity($item)
-    Local $requirement = GetItemReq($item)
 
-    If $rarity == $RARITY_GOLD		  Then Return False
-    If $rarity == $RARITY_BLUE		  Then Return True
+    If DllStructGetData($item, "Type") == $ITEM_TYPE_KEY Then Return False
+
+    If $rarity == $RARITY_GOLD			Then Return False
+    If $rarity == $RARITY_BLUE			Then Return False
     If $rarity == $RARITY_PURPLE		Then Return False
 
-    If $ModelID == $ITEM_DYES                       Then Return False
-    If InArray($ModelID, $SPECIAL_DROPS_ARRAY)            Then Return False
+    If $ModelID == $ITEM_DYES 						Then Return False ;Dyes
+    If InArray($ModelID, $SPECIAL_DROPS_ARRAY)      Then Return False ;ToT bags
     If InArray($ModelID, $ALL_TOMES_ARRAY)		    Then Return False ;Tomes
     If InArray($ModelID, $ALL_MATERIALS_ARRAY)		Then Return False ;Materials
-    If InArray($ModelID, $ALL_TROPHIES_ARRAY)	Then Return False ;Trophies
+    If InArray($ModelID, $ALL_TROPHIES_ARRAY)	    Then Return False ;Trophies
     If InArray($ModelID, $ALL_TITLE_ITEMS)			Then Return False ;Party, Alcohol, Sweet
     If InArray($ModelID, $ALL_SCROLLS_ARRAY)		Then Return False ;Scrolls
     If InArray($ModelID, $GENERAL_ITEMS_ARRAY)		Then Return False ;Lockpicks, Kits
@@ -289,20 +290,21 @@ Func CanSalvage($item)
     Return False
 EndFunc ;CanSalvage
 Func RetrieveSalvageKit()
-    If FindExpertSalvageKit() = 0 Then
-        If GetGoldCharacter() < 500 And GetGoldStorage() > 499 Then
-            WithdrawGold(500)
-            RndSleep(500)
-        EndIf
-        Local $j = 0
-        Do
-            BuyExpertSalvageKit()
-            RndSleep(500)
-            $j = $j + 1
-        Until FindExpertSalvageKit() <> 0 Or $j = 3
-        If $j = 3 Then Exit
+    If FindExpertSalvageKit() Then Return True
+
+    If GetGoldCharacter() < 500 And GetGoldStorage() > 499 Then
+        WithdrawGold(500)
         RndSleep(500)
     EndIf
+    Local $j = 0
+    Do
+        BuyExpertSalvageKit()
+        RndSleep(500)
+        $j = $j + 1
+    Until FindExpertSalvageKit() <> 0 Or $j = 3
+    If $j = 3 Then Return False
+    RndSleep(500)
+    Return True
 EndFunc ;RetrieveSalvageKit
 #EndRegion
 

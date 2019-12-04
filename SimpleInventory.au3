@@ -85,7 +85,7 @@ Func CanStore($item)
 
     If $ModelID == $TROPHY_DIESSA_CHALICE       Then Return True
     If $ModelID == $TROPHY_RIN_RELIC            Then Return True
-    If $ModelID == $ITEM_LOCKPICK               Then Return True
+    If $ModelID == $ITEM_LOCKPICK               Then Return True;False
     If $ModelID == 946 							Then Return False ;Planks
     If $ModelID == 953 							Then Return False ;Scales
     If $ModelID == 949 							Then Return False ;Steel ingots
@@ -279,7 +279,11 @@ Func CanSell($item)
     Local $ModelID = DllStructGetData($item, "ModelId")
     Local $rarity = GetRarity($item)
 
-    If $rarity == $RARITY_GOLD		  	Then Return True
+    If $rarity == $RARITY_GOLD Then
+        RetrieveIdentificationKit()
+        IdentifyItem($item)
+        Return True
+    EndIf
     If $rarity == $RARITY_BLUE		  	Then Return True
     If $rarity == $RARITY_PURPLE		Then Return True
 
