@@ -1,6 +1,5 @@
 #include-once
 
-
 #Region ### START Koda GUI section ### Form=s
 Global $frmMain = GUICreate("Froggy v1.0 - By Archer", 390, 312, 200, 124)
 GUISetFont(9, 400, 0, "Arial")

@@ -13,10 +13,10 @@
 #include <GuiRichEdit.au3>
 #include <Array.au3>
 #include <Date.au3>
-#include "GWA2_Headers.au3"
-#include "GWA2.au3"
+#include "../GWA2.au3"
 #include "AddsOn.au3"
 #include "GUI.au3"
+#NoTrayIcon
 
 Opt("GUIOnEventMode", 1)
 

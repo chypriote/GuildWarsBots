@@ -1,7 +1,7 @@
 #include <ComboConstants.au3>
 #include <GUIConstantsEx.au3>
 #include <GWA2.au3>
-AUTOITSETOPTION("TrayIconDebug", 1)
+#NoTrayIcon
 
 Opt("GUIOnEventMode", True)
 Opt("GUICloseOnESC", False)
