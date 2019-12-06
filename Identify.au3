@@ -12,6 +12,7 @@ Global $CharInput
 Global $StartButton
 Global $charname
 Global $BAGS_TO_USE = 4
+Global $USE_SUPERIOR_ID_KIT = True
 
 GUI()
 MainLoop()
@@ -72,11 +73,11 @@ EndFunc
 #Region Identification
 Func Identify()
     Local $item, $bag
-	
+
     For $i = 1 To $BAGS_TO_USE
         $bag = GetBag($i)
-		
-        If Not RetrieveIdentificationKit($USE_EXPERT_ID_KIT) Then Return
+
+        If Not RetrieveIdentificationKit($USE_SUPERIOR_ID_KIT) Then Return
         For $j = 1 To DllStructGetData($bag, "slots")
             $item = GetItemBySlot($i, $j)
             If DllStructGetData($item, "Id") == 0 Then ContinueLoop
@@ -85,19 +86,21 @@ Func Identify()
     Next
 EndFunc ;Identify
 Func RetrieveIdentificationKit($expert = True)
-    If FindIdentificationKit() = 0 Then
-        If GetGoldCharacter() < 500 And GetGoldStorage() > 499 Then
-            WithdrawGold(500)
-            RndSleep(500)
-        EndIf
-        Local $j = 0
-        Do
-            $expert ? BuySuperiorIdentificationKit() : BuyIdentificationKit()
-            RndSleep(500)
-            $j = $j + 1
-        Until FindIdentificationKit() <> 0 Or $j = 3
-        If $j = 3 Then Return False
+    If FindIdentificationKit() Then Return True
+
+    If GetGoldCharacter() < 500 And GetGoldStorage() > 499 Then
+        WithdrawGold(500)
         RndSleep(500)
     EndIf
+    Local $j = 0
+    Do
+        $expert ? BuySuperiorIdentificationKit() : BuyIdentificationKit()
+        RndSleep(500)
+        $j = $j + 1
+    Until FindIdentificationKit() <> 0 Or $j == 3
+    If $j == 3 Then Return False
+
+    RndSleep(500)
+    Return FindIdentificationKit()
 EndFunc ;RetrieveIdentificationKit
-#EndRegion Identification
+#EndRegion Identificationr

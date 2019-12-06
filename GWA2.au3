@@ -831,7 +831,7 @@ EndFunc   ;==>BuyIDKit
 
 ;~ Description: Buys an ID kit.
 Func BuyIdentificationKit($aQuantity = 1)
-    BuyItem(5, $aQuantity, 100)
+    BuyItem(4, $aQuantity, 100)
 EndFunc   ;==>BuyIdentificationKit
 
 ;~ Description: Legacy function, use BuySuperiorIdentificationKit instead.

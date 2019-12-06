@@ -72,10 +72,10 @@ EndFunc
 #Region Identification
 Func Open()
     Local $item, $bag
-    
+
     For $i = 1 To $BAGS_TO_USE
         $bag = GetBag($i)
-        
+
         For $j = 1 To DllStructGetData($bag, "slots")
             $item = GetItemBySlot($i, $j)
             If DllStructGetData($item, "Id") == 28434 Or DllStructGetData($item, "ModelId") == 28434 Then

@@ -85,7 +85,7 @@ Func CanStore($item)
 
     If $ModelID == $TROPHY_DIESSA_CHALICE       Then Return True
     If $ModelID == $TROPHY_RIN_RELIC            Then Return True
-    If $ModelID == $ITEM_LOCKPICK               Then Return True;False
+    If $ModelID == $ITEM_LOCKPICK               Then Return False
     If $ModelID == 946 							Then Return False ;Planks
     If $ModelID == 953 							Then Return False ;Scales
     If $ModelID == 949 							Then Return False ;Steel ingots
@@ -114,7 +114,7 @@ Func CanStore($item)
 EndFunc ;CanStore
 Func StoreItem($item)
     Local $slot
-	
+
     If InArray(DllStructGetData($item, 'Type'), $UNSTACKABLES) Then Return StoreInEmptySlot($item)
 
     For $i = 8 To 16
@@ -163,11 +163,11 @@ EndFunc ;StoreInEmptySlot
 #Region Identification
 Func Identify()
     Local $item, $bag
-	
+
     For $i = 1 To $BAGS_TO_USE
         $bag = GetBag($i)
-		
-        If Not RetrieveIdentificationKit($USE_EXPERT_ID_KIT) Then Return
+
+        If Not RetrieveIdentificationKit() Then Return
         For $j = 1 To DllStructGetData($bag, "slots")
             $item = GetItemBySlot($i, $j)
             If DllStructGetData($item, "Id") == 0 Then ContinueLoop
@@ -175,21 +175,23 @@ Func Identify()
         Next
     Next
 EndFunc ;Identify
-Func RetrieveIdentificationKit($expert = True)
-    If FindIdentificationKit() = 0 Then
-        If GetGoldCharacter() < 500 And GetGoldStorage() > 499 Then
-            WithdrawGold(500)
-            RndSleep(500)
-        EndIf
-        Local $J = 0
-        Do
-            $expert ? BuySuperiorIdentificationKit() : BuyIdentificationKit()
-            RndSleep(500)
-            $J = $J + 1
-        Until FindIdentificationKit() <> 0 Or $J = 3
-        If $J = 3 Then Return False
+Func RetrieveIdentificationKit()
+    If FindIdentificationKit() Then Return True
+
+    If GetGoldCharacter() < 500 And GetGoldStorage() > 499 Then
+        WithdrawGold(500)
         RndSleep(500)
     EndIf
+    Local $j = 0
+    Do
+        $USE_EXPERT_ID_KIT ? BuySuperiorIdentificationKit() : BuyIdentificationKit()
+        RndSleep(500)
+        $j = $j + 1
+    Until FindIdentificationKit() <> 0 Or $j = 3
+    If $j == 3 Then Return False
+
+    RndSleep(500)
+    Return FindIdentificationKit()
 EndFunc ;RetrieveIdentificationKit
 #EndRegion Identification
 
@@ -199,7 +201,7 @@ Func Salvage()
 
     For $i = 1 To $BAGS_TO_USE
         $bag = Getbag($i)
-		
+
         If Not RetrieveSalvageKit() Then Return
         For $j = 1 To DllStructGetData($bag, 'Slots')
             $item = GetItemBySlot($i, $j)
@@ -216,6 +218,7 @@ Func CanSalvage($item)
     Local $ModelID = DllStructGetData($item, "ModelId")
     Local $rarity = GetRarity($item)
 
+    If CountSlots() < 1 Then Return False
     If DllStructGetData($item, "Type") == $ITEM_TYPE_KEY Then Return False
 
     If $rarity == $RARITY_GOLD			Then Return False
@@ -268,7 +271,7 @@ Func Sell()
         For $j = 1 To DllStructGetData($bag, 'Slots')
             $item = GetItemBySlot($i, $j)
             If DllStructGetData($item, "Id") == 0 Then ContinueLoop
-            If CanSell($item) Then 
+            If CanSell($item) Then
                 SellItem($item) ;noSleep
                 RndSleep(250)
             EndIf
@@ -294,6 +297,7 @@ Func CanSell($item)
         ;Return False
     EndIf ;Dies
 
+    If $ModelID == 34 Then Return True ;Pouch
     If $ModelID == 946 Then Return True ;Planks
     If $ModelID == 949 Then Return True ;Steel ingots
     If $ModelID == 955 Then Return True ;Granite
