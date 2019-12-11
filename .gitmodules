@@ -10,10 +10,6 @@
 	path = TitlePackage
 	url = https://github.com/chypriote/GWTitlePackage
 
-[submodule "BorealRun"]
-	path = BorealRun
-	url = https://github.com/chypriote/GWBorealRun
-
 [submodule "HeroBook"]
 	path = HeroBook
 	url = https://github.com/chypriote/GWHeroBook

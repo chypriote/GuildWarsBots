@@ -3254,6 +3254,11 @@ Func GetEnergyCost($aSkillId)
     EndSwitch
 EndFunc   ;==>GetEnergyCost
 
+;~ Description: Returns activation time of a skill.
+Func GetActivationTime($aSkillId)
+	Return DllStructGetData(GetSkillByID($aSkillId), 'Activation')
+EndFunc ;GetActivationTime
+
 ;~ Description: Returns current morale.
 Func GetMorale($aHeroNumber = 0)
     Local $lAgentID = GetHeroID($aHeroNumber)

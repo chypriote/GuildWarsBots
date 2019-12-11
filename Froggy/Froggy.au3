@@ -1,23 +1,20 @@
-#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
-#AutoIt3Wrapper_Icon=..\..\..\Downloads\froggy.ico
-#AutoIt3Wrapper_Outfile=..\..\BogrootGrowthsByRitIRL.Exe
-#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
-#RequireAdmin
+
+#include <Array.au3>
 #include <ButtonConstants.au3>
+#include <Date.au3>
 #include <EditConstants.au3>
 #include <GUIConstants.au3>
 #include <GUIConstantsEx.au3>
-#include <StaticConstants.au3>
-#include <WindowsConstants.au3>
-#include <ScrollBarsConstants.au3>
 #include <GuiEdit.au3>
 #include <GuiRichEdit.au3>
-#include <Array.au3>
-#include <Date.au3>
+#include <ScrollBarsConstants.au3>
+#include <StaticConstants.au3>
+#include <WindowsConstants.au3>
 #include "GWA2_Headers.au3"
 #include "GWA2.au3"
 
-Opt("GUIOnEventMode", 1)
+#RequireAdmin
+;#include "GWA2_Headers.au3"
 
 
 Global Enum $HEROMODE_Fight, $HEROMODE_Guard, $HEROMODE_Avoid
@@ -75,6 +72,7 @@ Global $BAG_SLOTS[18] = [0, 20, 5, 10, 10, 20, 41, 12, 20, 20, 20, 20, 20, 20, 2
 
 #Region Constants
 ;Type (see: http://wiki.gamerevision.com/index.php/Item_Type)
+
 Global Const $TYPE_SALVAGE				= 0
 Global Const $TYPE_LEADHAND				= 1
 Global Const $TYPE_AXE					= 2
@@ -213,243 +211,323 @@ Global Const $TOME_ID_ARRAY[3] = [2, $MODEL_ID_TOME_E_SIN, $MODEL_ID_TOME_R_PARA
 ;Hero IDs [ID, "short Name"]
 Global Enum $HERO_ID_Norgu = 1, $HERO_ID_Goren, $HERO_ID_Tahlkora, $HERO_ID_Master, $HERO_ID_Jin, $HERO_ID_Koss, $HERO_ID_Dunkoro, $HERO_ID_Sousuke, $HERO_ID_Melonni, $HERO_ID_Zhed, $HERO_ID_Morgahn, $HERO_ID_Margrid, $HERO_ID_Zenmai, $HERO_ID_Olias, $HERO_ID_Razah, $HERO_ID_Mox, $HERO_ID_Keiran, $HERO_ID_Jora, $HERO_ID_Brandor, $HERO_ID_Anton, $HERO_ID_Livia, $HERO_ID_Hayda, $HERO_ID_Kahmu, $HERO_ID_Gwen, $HERO_ID_Xandra, $HERO_ID_Vekk, $HERO_ID_Ogden, $HERO_ID_MERCENARY_1, $HERO_ID_MERCENARY_2, $HERO_ID_MERCENARY_3, $HERO_ID_MERCENARY_4, $HERO_ID_MERCENARY_5, $HERO_ID_MERCENARY_6, $HERO_ID_MERCENARY_7, $HERO_ID_MERCENARY_8, $HERO_ID_Miku , $HERO_ID_Zei_Ri
 Global Const $HERO_ID[38][2] = [ [37, 1], [1, "Norgu"], [2, "Goren"], [3, "Tahlkora"], [4, "Master"], [5, "Jin"], [6, "Koss"], [7, "Dunkoro"], [8, "Sousuke"], [9, "Melonni"], [10, "Zhed"], [11, "Morgahn"], [12, "Margrid"], [13, "Zenmai"], [14, "Olias"], [15, "Razah"], [16, "Mox"], [17, "Keiran"], [18, "Jora"], [19, "Brandor"], [20, "Anton"], [21, "Livia"], [22, "Hayda"], [23, "Kahmu"], [24, "Gwen"], [25, "Xandra"], [26, "Vekk"], [27, "Ogden"], [28, "Mercenary Hero 1"], [29, "Mercenary Hero 2"], [30, "Mercenary Hero 3"], [31, "Mercenary Hero 4"], [32, "Mercenary Hero 5"], [33, "Mercenary Hero 6"], [34, "Mercenary Hero 7"], [35, "Mercenary Hero 8"], [36, "Miku"], [37, "Zei Ri"] ]
+Global Const $TYPE_ID [10] = [$TYPE_STAFF, $TYPE_WAND, $TYPE_SHIELD, $TYPE_SPEAR, $TYPE_SWORD, $TYPE_AXE, $TYPE_BOW, $TYPE_HAMMER, $TYPE_DAGGERS, $TYPE_SCYTHE]
+
 #Endregion
 
 
 
 #Region Runes & Insignas
-;~ link: http://www.gamerevision.com/showthread.php?7563-Rune-Trader-Price-Check&highlight=insignia
-;~ 				Autor Ralle1976 [Team Awesome]
-;~
-;~				 $array_mods_[x][0] = ModelID
-;~				 $array_mods_[x][1] = Name
-;~ 				 $array_mods_[x][2] = Mod Type
-;~				 $array_mods_[x][3] = Modstring
-Global $array_mods[201][4] = [ _
-		 [15545, "Dervish Rune of Minor Earth Prayers", 8,  "012BE821"], _
-		 [15545, "Dervish Rune of Minor Mysticism", 8,  "012CE821"], _
-		 [15545, "Dervish Rune of Minor Scythe Mastery", 8,  "0129E821"], _
-		 [15545, "Dervish Rune of Minor Wind Prayers", 8,  "012AE821"], _
-		 [15546, "Dervish Rune of Major Earth Prayers", 8,  "022BE8210703"], _
-		 [15546, "Dervish Rune of Major Mysticism", 8,  "022CE8210703"], _
-		 [15546, "Dervish Rune of Major Scythe Mastery", 8,  "0229E8210703"], _
-		 [15546, "Dervish Rune of Major Wind Prayers", 8,  "022AE8210703"], _
-		 [15547, "Dervish Rune of Superior Earth Prayers", 8,  "032BE8210903"], _  ; 32BE8210903 3025
-		 [15547, "Dervish Rune of Superior Mysticism", 8,  "032CE8210903"], _
-		 [15547, "Dervish Rune of Superior Scythe Mastery", 8,  "0329E8210903"], _
-		 [15547, "Dervish Rune of Superior Wind Prayers", 8,  "032AE8210903"], _
-		 [15548, "Paragon Rune of Minor Command", 8,  "0126E821"], _
-		 [15548, "Paragon Rune of Minor Leadership", 8,  "0128E821"], _
-		 [15548, "Paragon Rune of Minor Motivation", 8,  "0127E821"], _
-		 [15548, "Paragon Rune of Minor Spear Mastery", 8,  "0125E821"], _
-		 [15549, "Paragon Rune of Major Command", 8,  "0226E8210D03"], _
-		 [15549, "Paragon Rune of Major Leadership", 8,  "0228E8210D03"], _
-		 [15549, "Paragon Rune of Major Motivation", 8,  "0227E8210D03"], _
-		 [15549, "Paragon Rune of Major Spear Mastery", 8,  "0225E8210D03"], _
-		 [15550, "Paragon Rune of Superior Command", 8,  "0326E8210F03"], _
-		 [15550, "Paragon Rune of Superior Leadership", 8,  "0328E8210F03"], _
-		 [15550, "Paragon Rune of Superior Motivation", 8,  "0327E8210F03"], _
-		 [15550, "Paragon Rune of Superior Spear Mastery", 8,  "0325E8210F03"], _
-		 [19124, "Vanguard's Insignia [Assassin]", 8,  "DE010824"], _
-		 [19125, "Infiltrator's Insignia [Assassin]", 8,  "DF010824"], _
-		 [19126, "Saboteur's Insignia [Assassin]", 8,  "E0010824"], _
-		 [19127, "Nightstalker's Insignia [Assassin]", 8,  "E1010824"], _
-		 [19128, "Artificer's Insignia [Mesmer]", 8,  "E2010824"], _
-		 [19129, "Prodigy's Insignia [Mesmer]", 8,  "E3010824"], _
-		 [19130, "Virtuoso's Insignia [Mesmer]", 8,  "E4010824"], _
-		 [19131, "Radiant Insignia", 8,  "E5010824"], _
-		 [19132, "Survivor Insignia", 8,  "E6010824"], _
-		 [19133, "Stalwart Insignia", 8,  "E7010824"], _
-		 [19134, "Brawler's Insignia", 8,  "E8010824"], _
-		 [19135, "Blessed Insignia", 8,  "E9010824"], _
-		 [19136, "Herald's Insignia", 8,  "EA010824"], _
-		 [19137, "Sentry's Insignia", 8,  "EB010824"], _
-		 [19138, "Bloodstained Insignia [Necromancer]", 8,  "0A020824"], _
-		 [19139, "Tormentor's Insignia [Necromancer]", 8,  "EC010824"], _
-		 [19140, "Undertaker's Insignia [Necromancer]", 8,  "ED010824"], _
-		 [19141, "Bonelace Insignia [Necromancer]", 8,  "EE010824"], _
-		 [19142, "Minion Master's Insignia [Necromancer]", 8,  "EF010824"], _
-		 [19143, "Blighter's Insignia [Necromancer]", 8,  "F0010824"], _
-		 [19144, "Prismatic Insignia [Elementalist]", 8,  "F1010824"], _
-		 [19145, "Hydromancer Insignia [Elementalist]", 8,  "F2010824"], _
-		 [19146, "Geomancer Insignia [Elementalist]", 8,  "F3010824"], _
-		 [19147, "Pyromancer Insignia [Elementalist]", 8,  "F4010824"], _
-		 [19148, "Aeromancer Insignia [Elementalist]", 8,  "F5010824"], _
-		 [19149, "Wanderer's Insignia [Monk]", 8,  "F6010824"], _
-		 [19150, "Disciple's Insignia [Monk]", 8,  "F7010824"], _
-		 [19151, "Anchorite's Insignia [Monk]", 8,  "F8010824"], _
-		 [19152, "Knight's Insignia [Warrior]", 8,  "F9010824"], _
-		 [19153, "Lieutenant's Insignia [Warrior]", 8,  "08020824"], _
-		 [19154, "Stonefist Insignia [Warrior]", 8,  "09020824"], _
-		 [19155, "Dreadnought Insignia [Warrior]", 8,  "FA010824"], _
-		 [19156, "Sentinel's Insignia [Warrior]", 8,  "FB010824"], _
-		 [19157, "Frostbound Insignia [Ranger]", 8,  "FC010824"], _
-		 [19158, "Earthbound Insignia [Ranger]", 8,  "FD010824"], _
-		 [19159, "Pyrebound Insignia [Ranger]", 8,  "FE010824"], _
-		 [19160, "Stormbound Insignia [Ranger]", 8,  "FF010824"], _
-		 [19161, "Beastmaster's Insignia [Ranger]", 8,  "00020824"], _
-		 [19162, "Scout's Insignia [Ranger]", 8,  "01020824"], _
-		 [19163, "Windwalker Insignia [Dervish]", 8,  "02020824"], _  ; 040430A5060518A7
-		 [19164, "Forsaken Insignia [Dervish]", 8,  "03020824"], _
-		 [19165, "Shaman's Insignia [Ritualist]", 8,  "04020824"], _
-		 [19166, "Ghost Forge Insignia [Ritualist]", 8,  "05020824"], _
-		 [19167, "Mystic's Insignia [Ritualist]", 8,  "06020824"], _
-		 [19168, "Centurion's Insignia [Paragon]", 8,  "07020824"], _
-		 [3612, "Mesmer Rune of Major Domination Magic", 8,  "0202E8216B01"], _
-		 [3612, "Mesmer Rune of Major Fast Casting", 8,  "0200E8216B01"], _
-		 [3612, "Mesmer Rune of Major Illusion Magic", 8,  "0201E8216B01"], _
-		 [3612, "Mesmer Rune of Major Inspiration Magic", 8,  "0203E8216B01"], _
-		 [5549, "Mesmer Rune of Superior Domination Magic", 8,  "0302E8217701"], _
-		 [5549, "Mesmer Rune of Superior Fast Casting", 8,  "0300E8217701"], _
-		 [5549, "Mesmer Rune of Superior Illusion Magic", 8,  "0301E8217701"], _
-		 [5549, "Mesmer Rune of Superior Inspiration Magic", 8,  "0303E8217701"], _
-		 [5550, "Rune of Clarity", 8,  "01087827"], _
-		 [5550, "Rune of Major Vigor", 8,  "C202E927"], _
-		 [5550, "Rune of Purity", 8,  "05067827"], _
-		 [5550, "Rune of Recovery", 8,  "07047827"], _
-		 [5550, "Rune of Restoration", 8,  "00037827"], _
-		 [5551, "Rune of Superior Vigor", 8,  "C202EA27"], _
-		 [5552, "Necromancer Rune of Major Blood Magic", 8,  "0204E8216D01"], _
-		 [5552, "Necromancer Rune of Major Curses", 8,  "0207E8216D01"], _
-		 [5552, "Necromancer Rune of Major Death Magic", 8,  "0205E8216D01"], _
-		 [5552, "Necromancer Rune of Major Soul Reaping", 8,  "0206E8216D01"], _
-		 [5553, "Necromancer Rune of Superior Blood Magic", 8,  "0304E8217901"], _
-		 [5553, "Necromancer Rune of Superior Curses", 8,  "0307E8217901"], _
-		 [5553, "Necromancer Rune of Superior Death Magic", 8,  "0305E8217901"], _
-		 [5553, "Necromancer Rune of Superior Soul Reaping", 8,  "0306E8217901"], _
-		 [5554, "Elementalist Rune of Major Air Magic", 8,  "0208E8216F01"], _
-		 [5554, "Elementalist Rune of Major Earth Magic", 8,  "0209E8216F01"], _
-		 [5554, "Elementalist Rune of Major Energy Storage", 8,  "020CE8216F01"], _
-		 [5554, "Elementalist Rune of Major Fire Magic", 8,  "020AE8216F01"], _
-		 [5554, "Elementalist Rune of Major Water Magic", 8,  "020BE8216F01"], _
-		 [5555, "Elementalist Rune of Superior Air Magic", 8,  "0308E8217B01"], _
-		 [5555, "Elementalist Rune of Superior Earth Magic", 8,  "0309E8217B01"], _
-		 [5555, "Elementalist Rune of Superior Energy Storage", 8,  "030CE8217B01"], _
-		 [5555, "Elementalist Rune of Superior Fire Magic", 8,  "030AE8217B01"], _
-		 [5555, "Elementalist Rune of Superior Water Magic", 8,  "030BE8217B01"], _
-		 [5556, "Monk Rune of Major Healing Prayers", 8,  "020DE8217101"], _
-		 [5556, "Monk Rune of Major Protection Prayers", 8,  "020FE8217101"], _
-		 [5556, "Monk Rune of Major Smiting Prayers", 8,  "020EE8217101"], _
-		 [5556, "Monk Rune of Major Divine Favor", 8,  "0210E8217101"], _
-		 [5557, "Monk Rune of Superior Divine Favor", 8,  "0310E8217D01"], _
-		 [5557, "Monk Rune of Superior Healing Prayers", 8,  "030DE8217D01"], _
-		 [5557, "Monk Rune of Superior Protection Prayers", 8,  "030FE8217D01"], _
-		 [5557, "Monk Rune of Superior Smiting Prayers", 8,  "030EE8217D01"], _
-		 [903, "Warrior Rune of Minor Absorption", 8,  "EA02E827"], _
-		 [903, "Warrior Rune of Minor Axe Mastery", 8,  "0112E821"], _
-		 [903, "Warrior Rune of Minor Hammer Mastery", 8,  "0113E821"], _
-		 [903, "Warrior Rune of Minor Strength", 8,  "0111E821"], _
-		 [903, "Warrior Rune of Minor Swordsmanship", 8,  "0114E821"], _
-		 [903, "Warrior Rune of Minor Tactics", 8,  "0115E821"], _
-		 [5558, "Warrior Rune of Major Absorption", 8,  "EA02E927"], _
-		 [5558, "Warrior Rune of Major Axe Mastery", 8,  "0212E8217301"], _
-		 [5558, "Warrior Rune of Major Hammer Mastery", 8,  "0213E8217301"], _
-		 [5558, "Warrior Rune of Major Strength", 8,  "0211E8217301"], _
-		 [5558, "Warrior Rune of Major Swordsmanship", 8,  "0214E8217301"], _
-		 [5558, "Warrior Rune of Major Tactics", 8,  "0215E8217301"], _
-		 [5559, "Warrior Rune of Superior Absorption", 8,  "EA02EA27"], _
-		 [5559, "Warrior Rune of Superior Axe Mastery", 8,  "0312E8217F01"], _
-		 [5559, "Warrior Rune of Superior Hammer Mastery", 8,  "0313E8217F01"], _
-		 [5559, "Warrior Rune of Superior Strength", 8,  "0311E8217F01"], _
-		 [5559, "Warrior Rune of Superior Swordsmanship", 8,  "0314E8217F01"], _
-		 [5559, "Warrior Rune of Superior Tactics", 8,  "0315E8217F01"], _
-		 [5560, "Ranger Rune of Major Beast Mastery", 8,  "0216E8217501"], _
-		 [5560, "Ranger Rune of Major Expertise", 8,  "0217E8217501"], _
-		 [5560, "Ranger Rune of Major Marksmanship", 8,  "0219E8217501"], _
-		 [5560, "Ranger Rune of Major Wilderness Survival", 8,  "0218E8217501"], _
-		 [5561, "Ranger Rune of Superior Beast Mastery", 8,  "0316E8218101"], _
-		 [5561, "Ranger Rune of Superior Expertise", 8,  "0317E8218101"], _
-		 [5561, "Ranger Rune of Superior Marksmanship", 8,  "0319E8218101"], _
-		 [5561, "Ranger Rune of Superior Marksmanship", 8,  "0319E8218101"], _
-		 [5561, "Ranger Rune of Superior Wilderness Survival", 8,  "0318E8218101"], _
-		 [6324, "Assassin Rune of Minor Critical Strikes", 8,  "0123E821"], _
-		 [6324, "Assassin Rune of Minor Dagger Mastery", 8,  "011DE821"], _
-		 [6324, "Assassin Rune of Minor Deadly Arts", 8,  "011EE821"], _
-		 [6324, "Assassin Rune of Minor Shadow Arts", 8,  "011FE821"], _
-		 [6325, "Assassin Rune of Major Critical Strikes", 8,  "0223E8217902"], _
-		 [6325, "Assassin Rune of Major Dagger Mastery", 8,  "021DE8217902"], _
-		 [6325, "Assassin Rune of Major Deadly Arts", 8,  "021EE8217902"], _
-		 [6325, "Assassin Rune of Major Shadow Arts", 8,  "021FE8217902"], _
-		 [6326, "Assassin Rune of Superior Critical Strikes", 8,  "0323E8217B02"], _
-		 [6326, "Assassin Rune of Superior Dagger Mastery", 8,  "031DE8217B02"], _
-		 [6326, "Assassin Rune of Superior Deadly Arts", 8,  "031EE8217B02"], _
-		 [6326, "Assassin Rune of Superior Shadow Arts", 8,  "031FE8217B02"], _
-		 [6327, "Ritualist Rune of Minor Channeling Magic", 8,  "0122E821"], _
-		 [6327, "Ritualist Rune of Minor Communing", 8,  "0120E821"], _
-		 [6327, "Ritualist Rune of Minor Restoration Magic", 8,  "0121E821"], _
-		 [6327, "Ritualist Rune of Minor Spawning Power", 8,  "0124E821"], _
-		 [6328, "Ritualist Rune of Major Channeling Magic", 8,  "0222E8217F02"], _
-		 [6328, "Ritualist Rune of Major Communing", 8,  "0220E8217F02"], _
-		 [6328, "Ritualist Rune of Major Restoration Magic", 8,  "0221E8217F02"], _
-		 [6328, "Ritualist Rune of Major Spawning Power", 8,  "0224E8217F02"], _
-		 [6329, "Ritualist Rune of Superior Channeling Magic", 8,  "0322E8218102"], _
-		 [6329, "Ritualist Rune of Superior Communing", 8,  "0320E8218102"], _
-		 [6329, "Ritualist Rune of Superior Restoration Magic", 8,  "0321E8218102"], _
-		 [6329, "Ritualist Rune of Superior Spawning Power", 8,  "0324E8218102"], _
-		 [898, "Rune of Attunement", 8,  "0200D822"], _
-		 [898, "Rune of Minor Vigor", 8,  "C202E827"], _
-		 [898, "Rune of Vitae", 8,  "000A4823"], _
-		 [899, "Mesmer Rune of Minor Domination Magic", 8,  "0102E821"], _
-		 [899, "Mesmer Rune of Minor Fast Casting", 8,  "0100E821"], _
-		 [899, "Mesmer Rune of Minor Illusion Magic", 8,  "0101E821"], _
-		 [899, "Mesmer Rune of Minor Inspiration Magic", 8,  "0103E821"], _
-		 [900, "Necromancer Rune of Minor Blood Magic", 8,  "0104E821"], _
-		 [900, "Necromancer Rune of Minor Curses", 8,  "0107E821"], _
-		 [900, "Necromancer Rune of Minor Death Magic", 8,  "0105E821"], _
-		 [900, "Necromancer Rune of Minor Soul Reaping", 8,  "0106E821"], _
-		 [901, "Elementalist Rune of Minor Air Magic", 8,  "0108E821"], _
-		 [901, "Elementalist Rune of Minor Earth Magic", 8,  "0109E821"], _
-		 [901, "Elementalist Rune of Minor Energy Storage", 8,  "010CE821"], _
-		 [901, "Elementalist Rune of Minor Water Magic", 8,  "010BE821"], _
-		 [901, "Elementalist Rune of Minor Fire Magic", 8,  "010AE821"], _
-		 [902, "Monk Rune of Minor Divine Favor", 8,  "0110E821"], _
-		 [902, "Monk Rune of Minor Healing Prayers", 8,  "010DE821"], _
-		 [902, "Monk Rune of Minor Protection Prayers", 8,  "010FE821"], _
-		 [902, "Monk Rune of Minor Smiting Prayers", 8,  "010EE821"], _
-		 [904, "Ranger Rune of Minor Beast Mastery", 8,  "0116E821"], _
-		 [904, "Ranger Rune of Minor Expertise", 8,  "0117E821"], _
-		 [904, "Ranger Rune of Minor Marksmanship", 8,  "0119E821"], _
-		 [904, "Ranger Rune of Minor Wilderness Survival", 8,  "0118E821"], _
-		 [896, "Insightful Staff Head", 8, "0500D822"], _  ; +5 energy
-		 [896, "Adept Staff Head", 8, "00140828"], _  ; +20% FC
-		 [896, "Hale Staff Head", 8, "001E4823"], _  ; +30 HP (Focus)
-		 [15551, "Focus Core of Fortitude", 8, "001E4823"], _  ; +30 HP  (Focus)
-		 [15551, "Focus Core of Aptitude", 8, "00140828"], _  ; +20% FC
-		 [15554, "Shield Handle of Fortitude", 8, "001E4823"], _  ; +30 HP
-		 [909, "Sword Pommel of Enchanting", 8, "1400B822"], _  ; +20% Enchantment Duration
-		 [908, "Staff Wrapping of Enchanting", 8, "1400B822"], _  ; +20% Enchantment Duration
-		 [908, "Staff Wrapping of Fortitude", 8, "001E4823"], _  ; +30 HP
-		 [908, "Staff Wrapping of Mastery", 8, "00143828"], _  ; +1 Attribute (Focus)  $t = 12 is offhand, 24 is shield, 26 is staff
-		 [896, "Inscription: I have the power!", 8, "0500D822"], _  ; +5 energy (Sword)   also exists for other weapons (2/5/15/27/32/35/36)
-		 [15540, "Inscription: Forget me Not", 8, "00142828"], _  ; +20% FR
-		 [15541, "Focus Inscription: Master of my Domain", 8, "14011824"], _  ; +1 Attribute (Focus)
-		 [15541, "Shield Inscription: Master of my Domain", 8, "14011824"], _  ; +1 Attribute (Shield)
-		 [19122, "Staff Inscription: Master of my Domain", 8, "14011824"], _  ; +1 Attribute (Staff)
-		 [19122, "Inscription: Aptitude not Attitude", 8, "00140828"], _  ; +20% FC
-		 [19122, "Inscription: Hale and Hearty", 8, "05320823"]]  ; +5 energy while health > 50%
-
-		 ; Staff_Head = 896; Staff_Wrapping = 908; Shield_Handle = 15554; Focus_Core = 15551; Wand_Wrapping = 15552
-		 ; Bow_String = 894;_Bow_Grip = 906; Sword_Hilt = 897; Sword_Pommel = 909; Axe_Haft = 893; Axe_Grip = 905; Dagger_Tang = 6323
-		 ; Dagger_Handle = 6331; Hammer_Haft = 895; Hammer_Grip = 907; Scythe_Snathe = 15543; Scythe_Grip = 15553; Spearhead = 15544
-		 ; Martial Inscriptions = 15540, Focus/Shield Inscriptions  = 15541, Inscriptions_All = 15542, Inscriptions_General = 17059
-		 ; Inscriptions_Spellcasting = 19122, Inscriptions_Focus_Items = 19123
-		 ; [896, "Insightful Staff Head", 26, "0500D822"], _  ; +5 energy
-		 ;[896, "Adept Staff Head", 26, "00140828"], _  ; +20% FC
-		 ;[896, "Hale Staff Head", 26, "001E4823"], _  ; +30 HP (Focus)
-		 ;[15551, "Focus Core of Fortitude", 12, "001E4823"], _  ; +30 HP  (Focus)
-		 ;[15551, "Focus Core of Aptitude", 12, "00140828"], _  ; +20% FC
-		 ;[15554, "Shield Handle of Fortitude", 24, "001E4823"], _  ; +30 HP
-		 ;[909, "Sword Pommel of Enchanting", 27, "1400B822"], _  ; +20% Enchantment Duration
-		 ;[908, "Staff Wrapping of Enchanting", 26, "1400B822"], _  ; +20% Enchantment Duration
-		 ;[908, "Staff Wrapping of Fortitude", 26, "001E4823"], _  ; +30 HP
-		 ;[908, "Staff Wrapping of Mastery", 26, "00143828"], _  ; +1 Attribute (Focus)  $t = 12 is offhand, 24 is shield, 26 is staff
-		 ;[896, "Inscription: I have the power!", 27, "0500D822"], _  ; +5 energy (Sword)   also exists for other weapons (2/5/15/27/32/35/36)
-		 ;[15540, "Inscription: Forget me Not", 8, "1400B822"], _  ; +20% FR
-		 ;[15541, "Focus Inscription: Master of my Domain", 12, "14011824"], _  ; +1 Attribute (Focus)
-		 ;[15541, "Shield Inscription: Master of my Domain", 24, "14011824"], _  ; +1 Attribute (Shield)
-		 ;[19122, "Staff Inscription: Master of my Domain", 26, "14011824"], _  ; +1 Attribute (Staff)
-		 ;[19122, "Inscription: Aptitude not Attitude", 22, "00140828"], _  ; +20% FC
-		 ;[19122, "Inscription: Hale and Hearty", 8, "05320823"]]  ; +5 energy while health > 50%
+Global $array_armormods[184][4] = [ _
+	[15545, "Dervish Rune of Minor Earth Prayers", 8,  "012BE821"], _
+	[15545, "Dervish Rune of Minor Mysticism", 8,  "012CE821"], _
+	[15545, "Dervish Rune of Minor Scythe Mastery", 8,  "0129E821"], _
+	[15545, "Dervish Rune of Minor Wind Prayers", 8,  "012AE821"], _
+	[15546, "Dervish Rune of Major Earth Prayers", 8,  "022BE8210703"], _
+	[15546, "Dervish Rune of Major Mysticism", 8,  "022CE8210703"], _
+	[15546, "Dervish Rune of Major Scythe Mastery", 8,  "0229E8210703"], _
+	[15546, "Dervish Rune of Major Wind Prayers", 8,  "022AE8210703"], _
+	[15547, "Dervish Rune of Superior Earth Prayers", 8,  "032BE8210903"], _  ; 32BE8210903 3025
+	[15547, "Dervish Rune of Superior Mysticism", 8,  "032CE8210903"], _
+	[15547, "Dervish Rune of Superior Scythe Mastery", 8,  "0329E8210903"], _
+	[15547, "Dervish Rune of Superior Wind Prayers", 8,  "032AE8210903"], _
+	[15548, "Paragon Rune of Minor Command", 8,  "0126E821"], _
+	[15548, "Paragon Rune of Minor Leadership", 8,  "0128E821"], _
+	[15548, "Paragon Rune of Minor Motivation", 8,  "0127E821"], _
+	[15548, "Paragon Rune of Minor Spear Mastery", 8,  "0125E821"], _
+	[15549, "Paragon Rune of Major Command", 8,  "0226E8210D03"], _
+	[15549, "Paragon Rune of Major Leadership", 8,  "0228E8210D03"], _
+	[15549, "Paragon Rune of Major Motivation", 8,  "0227E8210D03"], _
+	[15549, "Paragon Rune of Major Spear Mastery", 8,  "0225E8210D03"], _
+	[15550, "Paragon Rune of Superior Command", 8,  "0326E8210F03"], _
+	[15550, "Paragon Rune of Superior Leadership", 8,  "0328E8210F03"], _
+	[15550, "Paragon Rune of Superior Motivation", 8,  "0327E8210F03"], _
+	[15550, "Paragon Rune of Superior Spear Mastery", 8,  "0325E8210F03"], _
+	[19124, "Vanguard's Insignia [Assassin]", 8,  "DE010824"], _
+	[19125, "Infiltrator's Insignia [Assassin]", 8,  "DF010824"], _
+	[19126, "Saboteur's Insignia [Assassin]", 8,  "E0010824"], _
+	[19127, "Nightstalker's Insignia [Assassin]", 8,  "E1010824"], _
+	[19128, "Artificer's Insignia [Mesmer]", 8,  "E2010824"], _
+	[19129, "Prodigy's Insignia [Mesmer]", 8,  "E3010824"], _
+	[19130, "Virtuoso's Insignia [Mesmer]", 8,  "E4010824"], _
+	[19131, "Radiant Insignia", 8,  "E5010824"], _
+	[19132, "Survivor Insignia", 8,  "E6010824"], _
+	[19133, "Stalwart Insignia", 8,  "E7010824"], _
+	[19134, "Brawler's Insignia", 8,  "E8010824"], _
+	[19135, "Blessed Insignia", 8,  "E9010824"], _
+	[19136, "Herald's Insignia", 8,  "EA010824"], _
+	[19137, "Sentry's Insignia", 8,  "EB010824"], _
+	[19138, "Bloodstained Insignia [Necromancer]", 8,  "0A020824"], _
+	[19139, "Tormentor's Insignia [Necromancer]", 8,  "EC010824"], _
+	[19140, "Undertaker's Insignia [Necromancer]", 8,  "ED010824"], _
+	[19141, "Bonelace Insignia [Necromancer]", 8,  "EE010824"], _
+	[19142, "Minion Master's Insignia [Necromancer]", 8,  "EF010824"], _
+	[19143, "Blighter's Insignia [Necromancer]", 8,  "F0010824"], _
+	[19144, "Prismatic Insignia [Elementalist]", 8,  "F1010824"], _
+	[19145, "Hydromancer Insignia [Elementalist]", 8,  "F2010824"], _
+	[19146, "Geomancer Insignia [Elementalist]", 8,  "F3010824"], _
+	[19147, "Pyromancer Insignia [Elementalist]", 8,  "F4010824"], _
+	[19148, "Aeromancer Insignia [Elementalist]", 8,  "F5010824"], _
+	[19149, "Wanderer's Insignia [Monk]", 8,  "F6010824"], _
+	[19150, "Disciple's Insignia [Monk]", 8,  "F7010824"], _
+	[19151, "Anchorite's Insignia [Monk]", 8,  "F8010824"], _
+	[19152, "Knight's Insignia [Warrior]", 8,  "F9010824"], _
+	[19153, "Lieutenant's Insignia [Warrior]", 8,  "08020824"], _
+	[19154, "Stonefist Insignia [Warrior]", 8,  "09020824"], _
+	[19155, "Dreadnought Insignia [Warrior]", 8,  "FA010824"], _
+	[19156, "Sentinel's Insignia [Warrior]", 8,  "FB010824"], _
+	[19157, "Frostbound Insignia [Ranger]", 8,  "FC010824"], _
+	[19158, "Earthbound Insignia [Ranger]", 8,  "FD010824"], _
+	[19159, "Pyrebound Insignia [Ranger]", 8,  "FE010824"], _
+	[19160, "Stormbound Insignia [Ranger]", 8,  "FF010824"], _
+	[19161, "Beastmaster's Insignia [Ranger]", 8,  "00020824"], _
+	[19162, "Scout's Insignia [Ranger]", 8,  "01020824"], _
+	[19163, "Windwalker Insignia [Dervish]", 8,  "02020824"], _  ; 040430A5060518A7
+	[19164, "Forsaken Insignia [Dervish]", 8,  "03020824"], _
+	[19165, "Shaman's Insignia [Ritualist]", 8,  "04020824"], _
+	[19166, "Ghost Forge Insignia [Ritualist]", 8,  "05020824"], _
+	[19167, "Mystic's Insignia [Ritualist]", 8,  "06020824"], _
+	[19168, "Centurion's Insignia [Paragon]", 8,  "07020824"], _
+	[3612, "Mesmer Rune of Major Domination Magic", 8,  "0202E8216B01"], _
+	[3612, "Mesmer Rune of Major Fast Casting", 8,  "0200E8216B01"], _
+	[3612, "Mesmer Rune of Major Illusion Magic", 8,  "0201E8216B01"], _
+	[3612, "Mesmer Rune of Major Inspiration Magic", 8,  "0203E8216B01"], _
+	[5549, "Mesmer Rune of Superior Domination Magic", 8,  "0302E8217701"], _
+	[5549, "Mesmer Rune of Superior Fast Casting", 8,  "0300E8217701"], _
+	[5549, "Mesmer Rune of Superior Illusion Magic", 8,  "0301E8217701"], _
+	[5549, "Mesmer Rune of Superior Inspiration Magic", 8,  "0303E8217701"], _
+	[5550, "Rune of Clarity", 8,  "01087827"], _
+	[5550, "Rune of Major Vigor", 8,  "C202E927"], _
+	[5550, "Rune of Purity", 8,  "05067827"], _
+	[5550, "Rune of Recovery", 8,  "07047827"], _
+	[5550, "Rune of Restoration", 8,  "00037827"], _
+	[5551, "Rune of Superior Vigor", 8,  "C202EA27"], _
+	[5552, "Necromancer Rune of Major Blood Magic", 8,  "0204E8216D01"], _
+	[5552, "Necromancer Rune of Major Curses", 8,  "0207E8216D01"], _
+	[5552, "Necromancer Rune of Major Death Magic", 8,  "0205E8216D01"], _
+	[5552, "Necromancer Rune of Major Soul Reaping", 8,  "0206E8216D01"], _
+	[5553, "Necromancer Rune of Superior Blood Magic", 8,  "0304E8217901"], _
+	[5553, "Necromancer Rune of Superior Curses", 8,  "0307E8217901"], _
+	[5553, "Necromancer Rune of Superior Death Magic", 8,  "0305E8217901"], _
+	[5553, "Necromancer Rune of Superior Soul Reaping", 8,  "0306E8217901"], _
+	[5554, "Elementalist Rune of Major Air Magic", 8,  "0208E8216F01"], _
+	[5554, "Elementalist Rune of Major Earth Magic", 8,  "0209E8216F01"], _
+	[5554, "Elementalist Rune of Major Energy Storage", 8,  "020CE8216F01"], _
+	[5554, "Elementalist Rune of Major Fire Magic", 8,  "020AE8216F01"], _
+	[5554, "Elementalist Rune of Major Water Magic", 8,  "020BE8216F01"], _
+	[5555, "Elementalist Rune of Superior Air Magic", 8,  "0308E8217B01"], _
+	[5555, "Elementalist Rune of Superior Earth Magic", 8,  "0309E8217B01"], _
+	[5555, "Elementalist Rune of Superior Energy Storage", 8,  "030CE8217B01"], _
+	[5555, "Elementalist Rune of Superior Fire Magic", 8,  "030AE8217B01"], _
+	[5555, "Elementalist Rune of Superior Water Magic", 8,  "030BE8217B01"], _
+	[5556, "Monk Rune of Major Healing Prayers", 8,  "020DE8217101"], _
+	[5556, "Monk Rune of Major Protection Prayers", 8,  "020FE8217101"], _
+	[5556, "Monk Rune of Major Smiting Prayers", 8,  "020EE8217101"], _
+	[5556, "Monk Rune of Major Divine Favor", 8,  "0210E8217101"], _
+	[5557, "Monk Rune of Superior Divine Favor", 8,  "0310E8217D01"], _
+	[5557, "Monk Rune of Superior Healing Prayers", 8,  "030DE8217D01"], _
+	[5557, "Monk Rune of Superior Protection Prayers", 8,  "030FE8217D01"], _
+	[5557, "Monk Rune of Superior Smiting Prayers", 8,  "030EE8217D01"], _
+	[903, "Warrior Rune of Minor Absorption", 8,  "EA02E827"], _
+	[903, "Warrior Rune of Minor Axe Mastery", 8,  "0112E821"], _
+	[903, "Warrior Rune of Minor Hammer Mastery", 8,  "0113E821"], _
+	[903, "Warrior Rune of Minor Strength", 8,  "0111E821"], _
+	[903, "Warrior Rune of Minor Swordsmanship", 8,  "0114E821"], _
+	[903, "Warrior Rune of Minor Tactics", 8,  "0115E821"], _
+	[5558, "Warrior Rune of Major Absorption", 8,  "EA02E927"], _
+	[5558, "Warrior Rune of Major Axe Mastery", 8,  "0212E8217301"], _
+	[5558, "Warrior Rune of Major Hammer Mastery", 8,  "0213E8217301"], _
+	[5558, "Warrior Rune of Major Strength", 8,  "0211E8217301"], _
+	[5558, "Warrior Rune of Major Swordsmanship", 8,  "0214E8217301"], _
+	[5558, "Warrior Rune of Major Tactics", 8,  "0215E8217301"], _
+	[5559, "Warrior Rune of Superior Absorption", 8,  "EA02EA27"], _
+	[5559, "Warrior Rune of Superior Axe Mastery", 8,  "0312E8217F01"], _
+	[5559, "Warrior Rune of Superior Hammer Mastery", 8,  "0313E8217F01"], _
+	[5559, "Warrior Rune of Superior Strength", 8,  "0311E8217F01"], _
+	[5559, "Warrior Rune of Superior Swordsmanship", 8,  "0314E8217F01"], _
+	[5559, "Warrior Rune of Superior Tactics", 8,  "0315E8217F01"], _
+	[5560, "Ranger Rune of Major Beast Mastery", 8,  "0216E8217501"], _
+	[5560, "Ranger Rune of Major Expertise", 8,  "0217E8217501"], _
+	[5560, "Ranger Rune of Major Marksmanship", 8,  "0219E8217501"], _
+	[5560, "Ranger Rune of Major Wilderness Survival", 8,  "0218E8217501"], _
+	[5561, "Ranger Rune of Superior Beast Mastery", 8,  "0316E8218101"], _
+	[5561, "Ranger Rune of Superior Expertise", 8,  "0317E8218101"], _
+	[5561, "Ranger Rune of Superior Marksmanship", 8,  "0319E8218101"], _
+	[5561, "Ranger Rune of Superior Marksmanship", 8,  "0319E8218101"], _
+	[5561, "Ranger Rune of Superior Wilderness Survival", 8,  "0318E8218101"], _
+	[6324, "Assassin Rune of Minor Critical Strikes", 8,  "0123E821"], _
+	[6324, "Assassin Rune of Minor Dagger Mastery", 8,  "011DE821"], _
+	[6324, "Assassin Rune of Minor Deadly Arts", 8,  "011EE821"], _
+	[6324, "Assassin Rune of Minor Shadow Arts", 8,  "011FE821"], _
+	[6325, "Assassin Rune of Major Critical Strikes", 8,  "0223E8217902"], _
+	[6325, "Assassin Rune of Major Dagger Mastery", 8,  "021DE8217902"], _
+	[6325, "Assassin Rune of Major Deadly Arts", 8,  "021EE8217902"], _
+	[6325, "Assassin Rune of Major Shadow Arts", 8,  "021FE8217902"], _
+	[6326, "Assassin Rune of Superior Critical Strikes", 8,  "0323E8217B02"], _
+	[6326, "Assassin Rune of Superior Dagger Mastery", 8,  "031DE8217B02"], _
+	[6326, "Assassin Rune of Superior Deadly Arts", 8,  "031EE8217B02"], _
+	[6326, "Assassin Rune of Superior Shadow Arts", 8,  "031FE8217B02"], _
+	[6327, "Ritualist Rune of Minor Channeling Magic", 8,  "0122E821"], _
+	[6327, "Ritualist Rune of Minor Communing", 8,  "0120E821"], _
+	[6327, "Ritualist Rune of Minor Restoration Magic", 8,  "0121E821"], _
+	[6327, "Ritualist Rune of Minor Spawning Power", 8,  "0124E821"], _
+	[6328, "Ritualist Rune of Major Channeling Magic", 8,  "0222E8217F02"], _
+	[6328, "Ritualist Rune of Major Communing", 8,  "0220E8217F02"], _
+	[6328, "Ritualist Rune of Major Restoration Magic", 8,  "0221E8217F02"], _
+	[6328, "Ritualist Rune of Major Spawning Power", 8,  "0224E8217F02"], _
+	[6329, "Ritualist Rune of Superior Channeling Magic", 8,  "0322E8218102"], _
+	[6329, "Ritualist Rune of Superior Communing", 8,  "0320E8218102"], _
+	[6329, "Ritualist Rune of Superior Restoration Magic", 8,  "0321E8218102"], _
+	[6329, "Ritualist Rune of Superior Spawning Power", 8,  "0324E8218102"], _
+	[898, "Rune of Attunement", 8,  "0200D822"], _
+	[898, "Rune of Minor Vigor", 8,  "C202E827"], _
+	[898, "Rune of Vitae", 8,  "000A4823"], _
+	[899, "Mesmer Rune of Minor Domination Magic", 8,  "0102E821"], _
+	[899, "Mesmer Rune of Minor Fast Casting", 8,  "0100E821"], _
+	[899, "Mesmer Rune of Minor Illusion Magic", 8,  "0101E821"], _
+	[899, "Mesmer Rune of Minor Inspiration Magic", 8,  "0103E821"], _
+	[900, "Necromancer Rune of Minor Blood Magic", 8,  "0104E821"], _
+	[900, "Necromancer Rune of Minor Curses", 8,  "0107E821"], _
+	[900, "Necromancer Rune of Minor Death Magic", 8,  "0105E821"], _
+	[900, "Necromancer Rune of Minor Soul Reaping", 8,  "0106E821"], _
+	[901, "Elementalist Rune of Minor Air Magic", 8,  "0108E821"], _
+	[901, "Elementalist Rune of Minor Earth Magic", 8,  "0109E821"], _
+	[901, "Elementalist Rune of Minor Energy Storage", 8,  "010CE821"], _
+	[901, "Elementalist Rune of Minor Water Magic", 8,  "010BE821"], _
+	[901, "Elementalist Rune of Minor Fire Magic", 8,  "010AE821"], _
+	[902, "Monk Rune of Minor Divine Favor", 8,  "0110E821"], _
+	[902, "Monk Rune of Minor Healing Prayers", 8,  "010DE821"], _
+	[902, "Monk Rune of Minor Protection Prayers", 8,  "010FE821"], _
+	[902, "Monk Rune of Minor Smiting Prayers", 8,  "010EE821"], _
+	[904, "Ranger Rune of Minor Beast Mastery", 8,  "0116E821"], _
+	[904, "Ranger Rune of Minor Expertise", 8,  "0117E821"], _
+	[904, "Ranger Rune of Minor Marksmanship", 8,  "0119E821"], _
+	[904, "Ranger Rune of Minor Wilderness Survival", 8,  "0118E821"]]
+Global $array_weaponmods[127][14] = [ _
+	[ "+7 armor vs Physical",   "07005821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+7 Armor vs Elemental",   "07002821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +5",   "05000821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "HCT20",   "00140828",   "" , 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "HCT10",   "000A0822",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "HSR20",   "00142828",   "" , 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "HSR10",   "000AA823",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+20% Enchantment Duration",   "1400B822",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Item's attribute +1 (Chance: 20%",   "00143828",   "" , 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+30 HP",   "001E4823",   "" , 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+45 HP while Enchanted",   "002D6823",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+45 HP while in a Stance",   "002D8823",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+60 HP while Hexed",   "003C7823",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Highly salvageable",   "32000826",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Improved sale value",   "3200F805",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Energy +5",   "0500D822",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Energy +5 (HP>50%)",   "05320823",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Energy +5 (while Enchanted)",   "0500F822",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Energy +7 (HP<50%)",   "07321823",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Energy +7 (while hexed)",   "07002823",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Energy +15 (-1 energy regen)",   "0F00D822",   "0100C820", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "-20% Bleeding",   "00005828",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "-20% Blind",   "00015828",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "-20% Crippled",   "00035828",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "-20% Dazed",   "00075828",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "-20% Deep Wound",   "00045828",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "-20% DiseaseInscribable",   "00055828",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "-20% Disease",   "E3017824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "-20% Poison",   "00065828",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "-20% Weakness",   "00085828",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Damage 20% (HP<50%)",   "14328822",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Damage 20% (while Hexed)",   "14009822",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Damage +15% (-1 energy regen)",   "0F003822",   "0100C820", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Damage +15% (-1 HP regen)",   "0F003822",   "0100E820", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Damage +15% (HP> 50%)",   "0F327822",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Damage +15% (while Enchanted)",   "0F006822",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Damage +15% (while in a Stance)",   "0F00A822",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Damage +15% (vs Hexed Foes)",   "0F005822",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Damage +15% (-10 AL while attacking)",   "0A001820",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Damage +15% (Energy -5)",   "0500B820",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Barbed",   "DE016824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Crippling",   "E1016824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Cruel",   "E2016824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Ebon",   "000BB824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Fiery",   "0005B824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Furious",   "0A00B823",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Heavy",   "E601824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Icy",   "0003B824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Poisonous",   "E4016824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Shocking",   "0004B824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Silencing",   "E5016824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Sundering",   "1414F823",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Vampiric (+3)",   "00032825",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Vampiric (+5)",   "00052825",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Zealous",   "01001825",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+ 20% (vs Charr)",   "00018080",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+ 20% (vs Demons)",   "00088080",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+ 20% (vs Dragons",   "00098080",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+ 20% (vs Dwarves)",   "00068080",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+ 20% (vs Giants)",   "00058080",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+ 20% (vs Ogres",   "000A8080",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+ 20% (vs Plants)",   "00038080",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+ 20% (vs Skeletons)",   "00048080",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+ 20% (vs Tengu)",   "00078080",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+ 20% (vs Trolls)",   "00028080",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+ 20% (vs Undead)",   "00008080",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +5 (HP> 50%)",   "0532A821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +10 (HP< 50%)",   "0A32B821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +5 (while Enchanted)",   "05009821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +5 (while attacking)",   "05007821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +5 (while casting)",   "05008821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +5 (vs Elemental)",   "05002821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +5 (vs Physical)",   "05005821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +5 (Energy -5)",   "0500B820",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +5 (Health -20)",   "1400D820",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ " Armor +10 (while Hexed)",   "0A00C821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+10 Armor vs.Undead",   "0A004821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+10 Armor vs.Charr",   "0A014821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+10 Armor vs.Trolls",   "0A024821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+10 Armor vs.Plants",   "0A034821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+10 Armor vs.Skeletons",   "0A044821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+10 Armor vs.Giants",   "0A054821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+10 Armor vs.Dwarves",   "0A064821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+10 Armor vs.Tengu",   "0A074821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+10 Armor vs.Demons",   "0A084821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+10 Armor vs.Dragons",   "0A094821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "+10 Armor vs.Ogres",   "0A0A4821",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +10 (vs Blunt)",   "0A0018A1",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +10 (vs Cold)",   "0A0318A1",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +10 (vs Earth)",   "0A0B18A1",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +10 (vs Fire)",   "0A0518A1",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +10 (vs Lightning)",   "0A0418A1",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +10 (vs Piercing)",   "0A0118A1",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Armor +10 (vs Slashing)",   "0A0218A1",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Damage -2 (while Enchanted",   "02008820",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Damage -2 (while in a Stance",   "0200A820",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Damage -3 (while Hexed",   "03009820",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Damage -5 (Chance: 20%",   "05147820",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Axe Mastery +1 (20% chance)",   "14121824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Marksmanship +1 (20% chance)",   "14191824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Dagger Mastery +1 (20% chance)",   "141D1824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Hammer Mastery +1 (20% chance)",   "14131824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Scythe Mastery +1 (20% chance)",   "14291824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Spear Mastery +1 (20% chance)",   "14251824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Swordmanship +1 (20% chance)",   "14141824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Air Magic +1 (20% chance)",   "14081824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Blood Magic +1 (20% chance)",   "14041824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Channeling Magic +1 (20% chance)",   "14221824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Communing Magic +1 (20% chance)",   "14201824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Curse Magic +1 (20% chance)",   "14071824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Death Magic +1 (20% chance)",   "14051824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Divine Favor  +1 (20% chance)",   "14101824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Domination Magic +1 (20% chance)",   "14021824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Earth Magic +1 (20% chance)",   "14091824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Fire Magic +1 (20% chance)",   "140A1824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Healing Prayers +1 (20% chance)",   "140D1824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Illusion Magic +1 (20% chance)",   "14011824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Inspiration  +1 (20% chance)",   "14031824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Protection Prayers +1 (20% chance)",   "140F1824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Restoration Magic +1 (20% chance)",   "14211824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Smiting Prayers +1 (20% chance)",   "140E1824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Soul Reaping +1 (20% chance)",   "14061824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Spawning Magic +1 (20% chance)",   "14241824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _
+	[ "Water Magic +1 (20% chance)",   "140B1824",   "" , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
 #EndRegion
 
 
@@ -457,79 +535,84 @@ Global $array_mods[201][4] = [ _
 
 Opt("GUIOnEventMode", 1)
 #Region ### START Koda GUI section ### Form=s
+$X_GUI = 8
+$Y_GUI = 8
+$Width_GUI = 390
+$Height_GUI = 312
+$iSpacing= 8
 
-Global $frmMain = GUICreate("Froggy v0.4 - By logicdoor", 390, 312, 200, 124)
+Global $frmMain = GUICreate("Froggy v0.6 - By logicdoor", 390, 312, 100, 112)
 GUISetFont(9, 400, 0, "Arial")
 Global $edtLog = _GUICtrlRichEdit_Create($frmMain, "", 128, 47, 254, 130, BitOR($ES_MULTILINE, $WS_VSCROLL, $ES_READONLY))
 _GUICtrlRichEdit_SetFont($edtLog, 9, "Arial")
 _GUICtrlRichEdit_SetCharColor($edtLog, "65280")
-_GUICtrlRichEdit_SetText($edtLog, StringFormat("#########################\r\n\r\nFroggy Bot v0.4 By logicdoor. Enjoy\r\n\r\n#########################\r\n\r\n"))
+_GUICtrlRichEdit_SetText($edtLog, StringFormat("#########################\r\n\r\nFroggy Bot v0.6 By logicdoor. Enjoy\r\n\r\n#########################\r\n\r\n"))
 Global $inpInit = GUICtrlCreateInput('WinGetProcess("Guild Wars")', 232, 8, 156, 24)
-Global $btnStart = GUICtrlCreateButton("Start", 8, 8, 113, 25)
-Global $grpGeneralStats = GUICtrlCreateGroup("Settings", 8, 40, 110, 136)
-Global $Render  = GUICtrlCreateCheckbox("Render", 16, 56, 76, 17)
+Global $btnStart = GUICtrlCreateButton("Start", $X_GUI, $Y_GUI, 113, 25)
+Global $grpGeneralStats = GUICtrlCreateGroup("Settings", $X_GUI, 40, 110, 136)
+Global $Render  = GUICtrlCreateCheckbox("Render", $X_GUI+8, 56, 76, 17)
 
 GUICtrlSetOnEvent(-1, "ToggleRendering")
 GUICtrlSetFont($Render, 9, -1, 0, "Arial")
 
-Global $Purge  = GUICtrlCreateCheckbox("Purge",     16, 72, 70, 17)
+Global $Purge = GUICtrlCreateCheckbox("Purge",     $X_GUI+$iSpacing, 72, 70, 17)
 GUICtrlSetOnEvent(-1, "Purgehook")
 GUICtrlSetFont($Purge, 9, -1, 0, "Arial")
 
-Global $Use_Scrolls = GUICtrlCreateCheckbox("Scrolls", 16, 88, 70, 17)
+Global $Use_Scrolls = GUICtrlCreateCheckbox("Scrolls", $X_GUI+$iSpacing, 88, 70, 17)
 GUICtrlSetOnEvent(-1, "ToggleScrolls")
 GUICtrlSetFont($Use_Scrolls, 9, -1, 0, "Arial")
 
-Global $Use_Stones = GUICtrlCreateCheckbox("Stones", 16, 104, 80, 17)
+Global $Use_Stones = GUICtrlCreateCheckbox("Stones", $X_GUI+$iSpacing, 104, 80, 17)
 GUICtrlSetOnEvent(-1, "ToggleStones")
 GUICtrlSetFont($Use_Stones, 9, -1, 0, "Arial")
 
-Global $Open_Chests  = GUICtrlCreateCheckbox("Open Chests", 16, 120, 90, 17)
+Global $Open_Chests  = GUICtrlCreateCheckbox("Open Chests", $X_GUI+$iSpacing, 120, 90, 17)
 guictrlsetstate ($Open_Chests, $GUI_CHECKED)
 GUICtrlSetOnEvent(-1, "ToggleOpenChests")
 GUICtrlSetFont($Open_Chests, 9, -1, 0, "Arial")
 
-Global $Store_Golds  = GUICtrlCreateCheckbox("Store Golds",      16, 136, 90, 17)
+Global $Store_Golds  = GUICtrlCreateCheckbox("Store Golds",      $X_GUI+$iSpacing, 136, 90, 17)
 GUICtrlSetOnEvent(-1, "ToggleStore")
 GUICtrlSetFont($Store_Golds, 9, -1, 0, "Arial")
 
-Global $Sell_Items   = GUICtrlCreateCheckbox("Auto-Sell",       16, 152, 70, 17)
+Global $Sell_Items   = GUICtrlCreateCheckbox("Auto-Sell",       $X_GUI+$iSpacing, 152, 70, 17)
 GUICtrlSetOnEvent(-1, "ToggleSell")
 GUICtrlSetFont($Sell_Items, 9, -1, 0, "Arial")
 
 GUICtrlCreateGroup("", -99, -99, 1, 1)
-Global $grpGeneralStats = GUICtrlCreateGroup("General Statistics", 8, 184, 182, 120)
+Global $grpGeneralStats = GUICtrlCreateGroup("General Statistics", $X_GUI, 184, 182, 120)
 GUICtrlSetFont($grpGeneralStats, 9, 800, 0, "Arial")
 
-Global $lblRunNum = GUICtrlCreateLabel("Run Number:", 16, 200, 80, 20)
+Global $lblRunNum = GUICtrlCreateLabel("Run Number:", $X_GUI+$iSpacing, 200, 80, 20)
 GUICtrlSetFont($lblRunNum, 9, -1, 0, "Arial")
 GUICtrlSetColor($lblRunNum, 0x0078D7)
 Global $lblRunNumData = GUICtrlCreateLabel("1", 120, 200, 64, 16, $SS_CENTER)
 GUICtrlSetFont($lblRunNumData, 9, -1, 0, "Arial")
 GUICtrlSetColor($lblRunNumData, 0x0078D7)
 
-Global $lblDeldrimor = GUICtrlCreateLabel("Deldrimor:", 16, 216, 90, 20)
+Global $lblDeldrimor = GUICtrlCreateLabel("Deldrimor:", $X_GUI+$iSpacing, 216, 90, 20)
 GUICtrlSetFont($lblDeldrimor, 9, -1, 0, "Arial")
 GUICtrlSetColor($lblDeldrimor, 0x0078D7)
 Global $lblDeldrimorData = GUICtrlCreateLabel("0", 120, 216, 64, 16, $SS_CENTER)
 GUICtrlSetFont($lblDeldrimorData, 9, -1, 0, "Arial")
 GUICtrlSetColor($lblDeldrimorData, 0x0078D7)
 
-Global $lblAsura = GUICtrlCreateLabel("Asura Points:", 16, 232, 76, 20)
+Global $lblAsura = GUICtrlCreateLabel("Asura Points:", $X_GUI+$iSpacing, 232, 76, 20)
 GUICtrlSetFont($lblAsura, 9, -1, 0, "Arial")
 GUICtrlSetColor($lblAsura, 0x0078D7)
 Global $lblAsuraData = GUICtrlCreateLabel("0", 120, 232, 64, 16, $SS_CENTER)
 GUICtrlSetFont($lblAsuraData, 9, -1, 0, "Arial")
 GUICtrlSetColor($lblAsuraData, 0x0078D7)
 
-Global $lblLockpicks = GUICtrlCreateLabel("Lockpicks:", 16, 248, 76, 20)
+Global $lblLockpicks = GUICtrlCreateLabel("Lockpicks:", $X_GUI+$iSpacing, 248, 76, 20)
 GUICtrlSetFont($lblLockpicks, 9, -1, 0, "Arial")
 GUICtrlSetColor($lblLockpicks, 0x0078D7)
 Global $lblLockpicksData = GUICtrlCreateLabel("0", 120, 248, 64, 16, $SS_CENTER)
 GUICtrlSetFont($lblLockpicksData, 9, -1, 0, "Arial")
 GUICtrlSetColor($lblLockpicksData, 0x0078D7)
 
-Global $lblCurrentRun = GUICtrlCreateLabel("Run Time:", 16, 264, 76, 20)
+Global $lblCurrentRun = GUICtrlCreateLabel("Run Time:", $X_GUI+$iSpacing, 264, 76, 20)
 GUICtrlSetFont($lblCurrentRun, 9, -1, 0, "Arial")
 GUICtrlSetColor($lblCurrentRun, 0x0078D7)
 Global $lblCurrentRunData = GUICtrlCreateLabel("00:00:00", 120, 264, 64, 16, $SS_CENTER)
@@ -537,51 +620,51 @@ GUICtrlSetFont($lblCurrentRunData, 9, -1, 0, "Arial")
 GUICtrlSetColor($lblCurrentRunData, 0x0078D7)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 
-Global $lblTotalRun = GUICtrlCreateLabel("Total Run Time:", 16, 280, 96, 20)
+Global $lblTotalRun = GUICtrlCreateLabel("Total Run Time:", $X_GUI+$iSpacing, 280, 96, 20)
 GUICtrlSetFont($lblTotalRun, 9, -1, 0, "Arial")
 GUICtrlSetColor($lblTotalRun, 0x0078D7)
 Global $lblTotalRunData = GUICtrlCreateLabel("00:00:00", 120, 280, 64, 16, $SS_CENTER)
 GUICtrlSetFont($lblTotalRunData, 9, -1, 0, "Arial")
 GUICtrlSetColor($lblTotalRunData, 0x0078D7)
 
-Global $grpDropStats = GUICtrlCreateGroup("Drop Statistics", 198, 184, 182, 120)
+Global $grpDropStats = GUICtrlCreateGroup("Drop Statistics", $X_GUI+24*$iSpacing, 184, 182, 120)
 GUICtrlSetFont($grpDropStats, 9, 800, 0, "Arial")
-   Global $lblFroggy = GUICtrlCreateLabel("Froggies: ", 206, 200, 90, 20)
+   Global $lblFroggy = GUICtrlCreateLabel("Froggies: ", $X_GUI+25*$iSpacing, 200, 90, 20)
    GUICtrlSetFont($lblFroggy, 9, -1, 0, "Arial")
    GUICtrlSetColor($lblFroggy, 0x808000)
    Global $lblFroggyData = GUICtrlCreateLabel("0", 310, 200, 64, 30, $SS_CENTER)
    GUICtrlSetFont($lblFroggyData, 9, -1, 0, "Arial")
    GUICtrlSetColor($lblFroggyData, 0x808000)
 
-   Global $lblGold = GUICtrlCreateLabel("Gold Items: ", 206, 216, 90, 20)
+   Global $lblGold = GUICtrlCreateLabel("Gold Items: ", $X_GUI+25*$iSpacing, 216, 90, 20)
    GUICtrlSetFont($lblGold, 9, -1, 0, "Arial")
    GUICtrlSetColor($lblGold, 0x808000)
    Global $lblGoldData = GUICtrlCreateLabel("0", 310, 216, 64, 30, $SS_CENTER)
    GUICtrlSetFont($lblGoldData, 9, -1, 0, "Arial")
    GUICtrlSetColor($lblGoldData, 0x808000)
 
-   Global $lblLockpicksDrop = GUICtrlCreateLabel("Lockpicks:", 206, 232, 76, 20)
+   Global $lblLockpicksDrop = GUICtrlCreateLabel("Lockpicks:", $X_GUI+25*$iSpacing, 232, 76, 20)
    GUICtrlSetFont($lblLockpicksDrop, 9, -1, 0, "Arial")
    GUICtrlSetColor($lblLockpicksDrop, 0x808000)
    Global $lblLockpicksDropData = GUICtrlCreateLabel("0", 310, 232, 64, 30, $SS_CENTER)
    GUICtrlSetFont($lblLockpicksDropData, 9, -1, 0, "Arial")
    GUICtrlSetColor($lblLockpicksDropData, 0x808000)
 
-   Global $lblChests = GUICtrlCreateLabel("Chests Opened:", 206, 248, 96, 20)
+   Global $lblChests = GUICtrlCreateLabel("Chests Opened:", $X_GUI+25*$iSpacing, 248, 96, 20)
    GUICtrlSetFont($lblChests, 9, -1, 0, "Arial")
    GUICtrlSetColor($lblChests, 0x808000)
    Global $lblChestsData = GUICtrlCreateLabel("0", 310, 248, 64, 23, $SS_CENTER)
    GUICtrlSetFont($lblChestsData, 9, -1, 0, "Arial")
    GUICtrlSetColor($lblChestsData, 0x808000)
 
-   Global $lblBlackDye = GUICtrlCreateLabel("Black Dye:", 206, 264, 96, 20)
+   Global $lblBlackDye = GUICtrlCreateLabel("Black Dye:", $X_GUI+25*$iSpacing, 264, 96, 20)
    GUICtrlSetFont($lblBlackDye, 9, -1, 0, "Arial")
    GUICtrlSetColor($lblBlackDye, 0x808000)
    Global $lblBlackDyeData = GUICtrlCreateLabel("0", 310, 264, 64, 23, $SS_CENTER)
    GUICtrlSetFont($lblBlackDyeData, 9, -1, 0, "Arial")
    GUICtrlSetColor($lblBlackDyeData, 0x808000)
 
-   Global $lblTomes = GUICtrlCreateLabel("Tomes: ", 206, 280, 90, 20)
+   Global $lblTomes = GUICtrlCreateLabel("Tomes: ", $X_GUI+25*$iSpacing, 280, 90, 20)
    GUICtrlSetFont($lblTomes, 9, -1, 0, "Arial")
    GUICtrlSetColor($lblTomes, 0x008000)
    Global $lblTomesData = GUICtrlCreateLabel("0", 310, 280, 64, 30, $SS_CENTER)
@@ -649,10 +732,89 @@ Global $Use_Stones = False
 Global $Store_Golds = False
 Global $Purge = False
 
+Global $ColLabels[11] = ["Staff", "Wand",  "Offhand", "Shield", "Spear", "Sword", "Axe", "Bow", "Hammer", "Daggers", "Scythe"]
+Global $iSpacing = 8
+
+#comments-start
+Global $frmSelection = GUICreate("Mod Selection", 774, 660, 600, 112)
+GUICtrlSetFont($frmSelection, 9, -1, 0, "Arial")
+
+GUICtrlCreateTab(1, 0, 774, 660)
+
+
+GUICtrlCreateTabItem("General Mods")
+	  Global $grpEnergy = GUICtrlCreateGroup("", 0, 14, 774, 660)
+	  For $j = 3 to 13
+		 GUICtrlCreateLabel($ColLabels[$j-3], $X_GUI + 60+(50 * $j), 40 , $iSpacing*6, $iSpacing*2, $ES_CENTER)
+		 For $i = 0 To 29
+			 If $j = 3 then GUICtrlCreateLabel($array_weaponmods[$i][0], $X_GUI+$iSpacing*2, 60 + (16 * $i),200, $iSpacing*2)
+			 $array_weaponmods[$i][$j-3] = GUICtrlCreateCheckbox("", $X_GUI + 72+(50 * $j), 60 + (16 * $i), $iSpacing*2, $iSpacing*2, $ES_CENTER)
+			 If $array_weaponmods[$i][$j] = 0 then guictrlsetstate (-1, $GUI_CHECKED)
+			 Next
+		  Next
+GUICtrlCreateTabItem("") ; end tabitem definition
+
+GUICtrlCreateTabItem("Damage")
+	  Global $grpEnergy = GUICtrlCreateGroup("", 0, 14, 774, 660)
+	  For $j = 3 to 13
+		 GUICtrlCreateLabel($ColLabels[$j-3], $X_GUI + 60+(50 * $j), 40 , $iSpacing*5, $iSpacing*2, $ES_CENTER)
+		 For $i = 30 To 65
+			 If $j = 3 then GUICtrlCreateLabel($array_weaponmods[$i][0], $X_GUI+$iSpacing*2, 60 + (16 * ($i - 30)),200, $iSpacing*2)
+			 $array_weaponmods[$i][$j-3] = GUICtrlCreateCheckbox("", $X_GUI + 72+(50 * $j), 60 + (16 * ($i - 30)), $iSpacing*2, $iSpacing*2, $ES_CENTER)
+			 If $array_weaponmods[$i][$j] = 0 then guictrlsetstate ($array_weaponmods[$i][$j], $GUI_CHECKED)
+			 Next
+		  Next
+
+GUICtrlCreateTabItem("") ; end tabitem definition
+
+GUICtrlCreateTabItem("Armor")
+	  Global $grpEnergy = GUICtrlCreateGroup("", 0, 14, 774, 660)
+	  For $j = 3 to 13
+		 GUICtrlCreateLabel($ColLabels[$j-3], $X_GUI + 60+(50 * $j), 40 , $iSpacing*5, $iSpacing*2, $ES_CENTER)
+		 For $i = 66 To 97
+			 If $j = 3 then GUICtrlCreateLabel($array_weaponmods[$i][0], $X_GUI+$iSpacing*2, 60 + (16 * ($i - 66)),200, $iSpacing*2)
+			 $array_weaponmods[$i][$j-3] = GUICtrlCreateCheckbox("", $X_GUI + 72+(50 * $j), 60 + (16 * ($i - 66)), $iSpacing*2, $iSpacing*2, $ES_CENTER)
+			 If $array_weaponmods[$i][$j] = 0 then guictrlsetstate ($array_weaponmods[$i][$j], $GUI_CHECKED)
+			 Next
+		  Next
+
+GUICtrlCreateTabItem("") ; end tabitem definition
+
+GUICtrlCreateTabItem("Mastery")
+	  Global $grpEnergy = GUICtrlCreateGroup("", 0, 14, 774, 660)
+	  For $j = 3 to 13
+		 GUICtrlCreateLabel($ColLabels[$j-3], $X_GUI + 60+(50 * $j), 40 , $iSpacing*5, $iSpacing*2, $ES_CENTER)
+		 For $i = 98 To 123
+			 If $j = 3 then GUICtrlCreateLabel($array_weaponmods[$i][0], $X_GUI+$iSpacing*2, 60 + (16 * ($i - 98)),200, $iSpacing*2)
+			 $array_weaponmods[$i][$j-3] = GUICtrlCreateCheckbox("", $X_GUI + 72+(50 * $j), 60 + (16 * ($i - 98)), $iSpacing*2, $iSpacing*2, $ES_CENTER)
+			 If $array_weaponmods[$i][$j] = 0 then guictrlsetstate ($array_weaponmods[$i][$j], $GUI_CHECKED)
+			 Next
+		  Next
+
+GUICtrlCreateTabItem("") ; end tabitem definition
+GUICtrlCreateGroup("", -99, -99, 1, 1)
+
+GUISetOnEvent($GUI_EVENT_CLOSE, "ExitBot")
+
+GUISetState()
+
+#comments-end
+
+
 Main()
 
 Func Main()
 	While 1
+		 For $i = 0 To 123
+			   For $j = 3 to 13
+				  If $array_weaponmods[$i][$j] = 1 then
+					 GUIctrlsetstate ($array_weaponmods[$i][$j], $GUI_CHECKED)
+				  Else
+					 GUICtrlSetState($array_weaponmods[$i][$j], $GUI_UNCHECKED)
+				  EndIf
+			   Next
+		 Next
+
 		Sleep(100)
 		While $bRunning And $iCurrentRun < $iRunNum
 			GUICtrlSetData($lblLockpicksData, GetPicksCount())
@@ -667,6 +829,7 @@ Func Main()
 			ReDim $OpenedChestAgentIDs[1]
 
 			If GetMapID() = $iSplarkflyMapID then
+			   If $iCurrentRun = 1 then RunToBogroot()
 			   TakeQuest()
 			Endif
 
@@ -676,6 +839,7 @@ Func Main()
 			If GetMapID() = $iBogrootGrowthsLevel1MapID then
 			   BogrootLvl1()
 			Endif
+
 			If GetMapID() = $iBogrootGrowthsLevel2MapID then  ; allows the bot to start straight from level 2
 			   BogrootLvl2()
 			   Boss()
@@ -817,17 +981,6 @@ Func Out($sMessage)
  EndFunc
 
  Func BogrootLvl1 ()
-
-	Out("Aggro Frog Fight")
-	MoveTo(17026, 2168)
-	AggroMoveToEx(18092, 4590)
-
-	Out("Moving to Beacon of Droknar")
-	MoveTo(19099, 7762)
-
-	Out("Getting Dwarven Blessing")
-	GetDwarvenBlessing(19099, 7762)
-
 	; Level 1
 	Local $aWaypointsLevel1[19][4] = [ _
 	[16342, 8640, 1500, "First Group"], _
@@ -851,6 +1004,17 @@ Func Out($sMessage)
 	[7552, -18776, 1500, "Moving to Level 2 Portal"]]
 
     $NearestWaypoint = GetNearestWaypointIndex($aWaypointsLevel1)
+    If $NearestWaypoint <3  then
+	   Out("Aggro Frog Fight")
+	   MoveTo(17026, 2168)
+	   AggroMoveToEx(18092, 4590)
+	   Out("Moving to Beacon of Droknar")
+	   MoveTo(19099, 7762)
+	   Out("Getting Dwarven Blessing")
+	   GetDwarvenBlessing(19099, 7762)
+    Else
+	   Out("Starting mid-level at " & $aWaypointsLevel1[$NearestWaypoint][3])
+    Endif
 
     UseScroll()
 	UseStones()
@@ -868,7 +1032,7 @@ Func Out($sMessage)
 
 Endfunc
 
-Func BogrootLvl2()
+Func BogrootLvl2 ()
 	; Level 2
 	$DeadOnTheRun = 0
 	Local $aWaypointsLevel2[27][4] = [ _
@@ -914,6 +1078,7 @@ Func BogrootLvl2()
     Else
 	   Out("Starting mid-level at " & $aWaypointsLevel2[$NearestWaypoint][3])
     Endif
+
     UseScroll()
     UseStones()
     MoveandAggro($aWaypointsLevel2)
@@ -936,7 +1101,7 @@ Func BogrootLvl2()
 	MoveTo(17482, -6661)	;so you don't get stuck at Boss Lock
 EndFunc
 
-; Boss
+	; Boss
 Func Boss()
 	Local $aWaypointsBoss[9][4] = [ _
 	[18334, -8838, 2000, "Moving to Boss"], _
@@ -964,6 +1129,7 @@ Func Boss()
 	$NearestDistance = @extended
 	If $NearestDistance > 4000 Then
 	  Out("Boss Group Dead")
+
 	  Sleep(2000)
 
 	  Out("Accepting Quest Reward")
@@ -1034,7 +1200,7 @@ Func MoveandAggro($aWaypoints)
 		Local $nRange = $aWaypoints[$i][2]
 		AggroMoveToEx($nWaypointX, $nWaypointY, $nRange)
 	Next
-EndFunc
+ EndFunc
 
 ; returns the index of the nearest waypoint in an array of waypoints
 Func GetNearestWaypointIndex($aWaypoints)
@@ -1052,7 +1218,7 @@ Func GetNearestWaypointIndex($aWaypoints)
 		EndIf
 	Next
 	Return $lNearestWaypoint
-EndFunc   ;==>GetNearestWaypointIndex
+ EndFunc   ;==>GetNearestWaypointIndex
 
 Func AggroMoveToEx($x, $y, $z = 1200) ;Reduced from 2000
    $random = 50
@@ -1241,6 +1407,28 @@ Func Fight_Rit($nRange = 1200)
 	PickupLootEx()
 EndFunc
 
+Func GetSpiritsInRange($nRange = 600)
+	Local $lMe = GetAgentByID(-2)
+	Local $nSpirits = 0
+	$lMe = GetAgentByID(-2)
+	For $i = 1 to GetMaxAgents()
+		$aAgent = GetAgentByID($i)
+		If Not BitAND(DllStructGetData($aAgent, 'Typemap'), 131072) Then ContinueLoop
+		If BitAND(DllStructGetData($aAgent, 'Effects'), 0x0010) Then ContinueLoop
+		If BitAND(DllStructGetData($aAgent, 'Typemap'), 262144) And GetDistance($aAgent, $lMe) <= $nRange Then
+			$nSpirits += 1
+		EndIf
+	Next
+	Return $nSpirits
+ EndFunc
+
+ Func SkillSleep($nSkillID)
+	$aSkill = GetSkillByID($nSkillID)
+	$nActivationTime = DllStructGetData($aSkill, 'Activation') * 1000
+	Sleep($nActivationTime + 100)
+ EndFunc
+
+
 
 #Region Loot
 
@@ -1276,7 +1464,7 @@ Func CheckForChest()
 	ChangeTarget($AgentArray[0][0])	;in case you watch the bot running you can see what dropped immediately
     GUICtrlSetData($lblChestsData, $iChestCount)
 	PickUpLootEX(3300)
-EndFunc   ;==>CheckForChest
+ EndFunc   ;==>CheckForChest
 
 Func PickupLootEx($iMaxDist = 2000, $bCanPickup = True)
 	$lMe = GetAgentByID(-2)
@@ -1319,12 +1507,6 @@ Func CanPickUpEx($aItem, $bCanPickup)
 ;			$iUniqueCount += 1
 ;			Return True
    EndSwitch
-
-   Switch $aExtraID
-	  Case 10  ; Black dye
-		 $iBlackDyeCount += 1
-		 Return True
-	  EndSwitch
 
    Switch $aModelID
 	  Case 1953, 1956, 1957, 1958, 1959, 1960, 1961, 1962, 1963, 1964, 1965, 1966, 1967, 1968, 1969, 1970, 1971, 1972, 1973, 1974, 1975 ; All Froggy's
@@ -1410,20 +1592,20 @@ Func ClearInventory()
 	  For $lBag = 1 To $UseBags ; allows the use of 4 bags, change to protect bags
 		 For $lSlot = 1 To DllStructGetData(GetBag($lBag), 'Slots')
 			$aItem = GetItemBySlot($lBag, $lSlot)
-			If Not ItemHasUsefulMod($aItem) and CanSell($aItem) Then
+			If Not ItemHasUsefulMod($aItem) and Not HasUsefulMod($aItem) and CanSell($aItem) Then
 			   SellItem($aItem)
 			   $Timer = TimerInit()
 			   Do
 				  Sleep(2500)
 			   Until DllStructGetData(GetItemBySlot($lBag, $lSlot), 'ID') == 0 Or TimerDiff($Timer) > 10000
-			Elseif ItemHasUsefulMod($aItem) then
+			Elseif ItemHasUsefulMod($aItem) or HasUsefulMod($aItem) then
 				 $aMod = @extended  ; doing runes stuff at the end so that there's no risk of no inventory space left
 				 $Timer = TimerInit()
 				 Do
 					 StartSalvageSuperiorKit($aItem, 16)
-					 Sleep(GetPing() + 900)
+					 Sleep(GetPing() + 1000)
 					 SalvageMod($aMod)
-					 Sleep(GetPing() + 900)
+					 Sleep(GetPing() + 1000)
 				 Until TimerDiff($Timer) > 15000
 			EndIf
 		 Next
@@ -1446,16 +1628,37 @@ Func ClearInventory()
 	Next
  EndFunc	;==>CheckInventory
 
+Global Enum $iStaff=3, $iWand, $iOffhand,  $iShield, $iSpear, $iSword, $iAxe, $iBow, $iHammer, $iDaggers, $iScythe
+Global $iStaff
+
+
+
+Func HasUsefulMod($aItem)
+    $aModStruct = GetModStruct($aItem)
+	$aType = DllStructGetData($aItem,'Type')
+	For $i = 0 to 12
+		 For $j = 0 to 10
+			If StringInStr($aModStruct, $array_weaponmods[$i][1]) > 0 and $aType = $TYPE_ID[$j]  then
+			   Out (StringInStr($aModStruct, $array_weaponmods[$i][0]))
+			   Out($array_weaponmods[$i][0])
+			   Out ($TYPE_ID[$j])
+			   Return True
+			Else
+			   Return False
+			Endif
+		 Next
+	  Next
+   EndFunc
+
+
 Func ItemHasUsefulMod($aItem)
 	If DllStructGetData($aItem, 'Type') <> $TYPE_SALVAGE Then Return False
 	;things that should be kept
 	Local $lWhiteListMods[21] = [20, "Survivor Insignia", "Radiant Insignia", "Blessed Insignia", _
 			"Sentinel's Insignia [Warrior]", "Bloodstained Insignia [Necromancer]", "Prodigy's Insignia [Mesmer]", _
 			"Nightstalker's Insignia [Assassin]", "Shaman's Insignia [Ritualist]", "Windwalker Insignia [Dervish]", _
-			"Centurion's Insignia [Paragon]", _
-			"Staff Wrapping of Mastery" , "Staff Wrapping of Enchanting", "Staff Wrapping of Fortitude", _
-			"Insightful Staff Head", "Adept Staff Head", "Hale Staff Head", "Focus Core of Aptitude", "Shield Handle of Fortitude", _
-			"Inscription: Forget me Not", "Inscription: Aptitude not Attitude"]
+			"Centurion's Insignia [Paragon]"]
+
 	Local $lWhiteListRunes[12] = [11, "Mesmer Rune of Superior Fast Casting", "Mesmer Rune of Superior Domination Magic", _
 			"Ritualist Rune of Superior Channeling Magic", "Ritualist Rune of Superior Communing", _
 			"Dervish Rune of Superior Earth Prayers", "Necromancer Rune of Superior Death Magic", _
@@ -1465,10 +1668,10 @@ Func ItemHasUsefulMod($aItem)
 	For $index = 0 To 1
 		If $index == 0 Then $ListToUse = $lWhiteListMods
 		If $index == 1 Then $ListToUse = $lWhiteListRunes
-		For $i = 0 To 200	;all mods, inscriptions, runes, insignias from Mod Array
+		For $i = 0 To 183	;all mods, inscriptions, runes, insignias from Mod Array
 			For $j = 1 To $ListToUse[0]
-				If $array_mods[$i][1] == $ListToUse[$j] Then
-					If StringInStr($lModStruct, $array_mods[$i][3]) > 0 Then
+				If $array_armormods[$i][1] == $ListToUse[$j] Then
+					If StringInStr($lModStruct, $array_armormods[$i][3]) > 0 Then
 						SetExtended($index)
 						Return True
 					EndIf
@@ -1486,9 +1689,9 @@ Func CanSell($aItem)
 	Local $aType = DllStructGetData($aItem, 'Type')
 	Local $aReq = GetItemReq($aItem)
 
-;Staff_Head = 896; Staff_Wrapping = 908; Shield_Handle = 15554; Focus_Core = 15551; ID_Wand = 15552; Bow_String = 894; Bow_Grip = 906; Sword_Hilt = 897; Sword_Pommel = 909; Axe_Haft = 893
-; Axe_Grip = 905; Dagger_Tang = 6323; Dagger_Handle = 6331; Hammer_Haft = 895; Hammer_Grip = 907; Scythe_Snathe = 15543; Scythe_Grip = 15553; Spearhead = 15544; Spear_Grip = 15555
-; Inscriptions_Martial = 15540; Inscriptions_Focus_Shield = 15541; Inscriptions_All = 15542; Inscriptions_General = 17059; Inscriptions_Spellcasting = 19122; Inscriptions_Focus_Items = 19123
+	;Staff_Head = 896; Staff_Wrapping = 908; Shield_Handle = 15554; Focus_Core = 15551; ID_Wand = 15552; Bow_String = 894; Bow_Grip = 906; Sword_Hilt = 897; Sword_Pommel = 909; Axe_Haft = 893
+	; Axe_Grip = 905; Dagger_Tang = 6323; Dagger_Handle = 6331; Hammer_Haft = 895; Hammer_Grip = 907; Scythe_Snathe = 15543; Scythe_Grip = 15553; Spearhead = 15544; Spear_Grip = 15555
+	; Inscriptions_Martial = 15540; Inscriptions_Focus_Shield = 15541; Inscriptions_All = 15542; Inscriptions_General = 17059; Inscriptions_Spellcasting = 19122; Inscriptions_Focus_Items = 19123
 
    Switch $aModelID
 	  Case 896, 908, 15542, 1151, 15554, 15551 _ ; select mods and inscriptions (see list above and adjust as needed) - salvaged manually (bot won't salavage them)
@@ -1500,13 +1703,13 @@ Func CanSell($aItem)
 		 Return False
 	  Endswitch
 
-;   Switch $Rarity
-;	  	Case $Rarity_Gold
-;		 	Switch $aReq
-;				Case 9
-;			   		Return False
-;			Endswitch
-;   	Endswitch
+	;   Switch $Rarity
+	;	  	Case $Rarity_Gold
+	;		 	Switch $aReq
+	;				Case 9
+	;			   		Return False
+	;			Endswitch
+	;   	Endswitch
 
    Switch $aType
 	  Case $TYPE_RUNE_AND_MOD, $TYPE_USABLE, $TYPE_KIT, $TYPE_SCROLL, $TYPE_DYE
@@ -1528,7 +1731,6 @@ Func CanSell($aItem)
 	  EndSwitch
 
    Return True
-
 EndFunc	;==>CanSell
 
 ;=================================================================================================
@@ -2054,18 +2256,6 @@ Func ToggleStones()
    EndIf
 EndFunc   ;==>ToggleStones
 
- Func ToggleRendering()
-	$RenderingEnabled = Not $RenderingEnabled
-	If $RenderingEnabled Then
-		EnableRendering()
-		WinSetState(GetWindowHandle(), "", @SW_SHOW)
-	Else
-		DisableRendering()
-		WinSetState(GetWindowHandle(), "", @SW_HIDE)
-		ClearMemory()
-	EndIf
- EndFunc   ;==>ToggleRendering
-
 Func ToggleOpenChests()
    If $Open_Chests = True Then
 	  $Open_Chests = False
@@ -2160,20 +2350,5 @@ Func ExitBot()
 	AdlibUnRegister("DropCounts")
 	Exit
  EndFunc
-
- Func GetSpiritsInRange($nRange = 600)
-	Local $me = GetAgentByID(-2)
-	Local $nSpirits = 0
-	$me = GetAgentByID(-2)
-	For $i = 1 to GetMaxAgents()
-		$aAgent = GetAgentByID($i)
-		If Not BitAND(DllStructGetData($aAgent, 'Typemap'), 131072) Then ContinueLoop
-		If BitAND(DllStructGetData($aAgent, 'Effects'), 0x0010) Then ContinueLoop
-		If BitAND(DllStructGetData($aAgent, 'Typemap'), 262144) And GetDistance($aAgent, $me) <= $nRange Then
-			$nSpirits += 1
-		EndIf
-	Next
-	Return $nSpirits
-EndFunc
 
 #Endregion GUI Functions

@@ -1,7 +1,7 @@
 #include <ComboConstants.au3>
 #include <GUIConstantsEx.au3>
 #include <GWA2.au3>
-#include "Constants.au3"
+#include "_Constants.au3"
 AUTOITSETOPTION("TrayIconDebug", 1)
 
 Opt("GUIOnEventMode", True)

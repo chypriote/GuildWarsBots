@@ -2,7 +2,7 @@
 #include <GUIConstantsEx.au3>
 #include <StaticConstants.au3>
 #include "GWA2.au3"
-#include "SimpleInventory.au3"
+#include "_SimpleInventory.au3"
 #include "Extras.au3"
 #NoTrayIcon
 
@@ -43,7 +43,7 @@ Global $Runs  = 0
 #EndRegion Globals
 
 #Region GUI
-	Global $GUI = GUICreate("Boreal v1.5", 220, 220)
+	Global $GUI = GUICreate("Boreal v2.0", 220, 220)
 	$Input = GUICtrlCreateCombo("", 08, 10, 100 , 20)
 	GUICtrlSetData(-1, GetLoggedCharNames())
 
@@ -164,6 +164,7 @@ EndFunc ;TravelToOutpost
 
 Func Setup()
 	SwitchMode(GUICtrlRead($HardMode) == $GUI_CHECKED)
+	LeaveGroup()
 	LoadSkillTemplate("OwET0YIWV6usrgmktAkAAAAAAAA")
 	Out("Setup resign")
 	MoveTo(5520, -27828)
@@ -175,7 +176,8 @@ EndFunc ;Setup
 
 Func GoOut()
 	Out("Going Out")
-	Move(4637, -27817)
+	MoveTo(5520, -27828)
+	Move(4700, -27817)
 	WaitMapLoading($ICE_CLIFF_CHASM)
 EndFunc ;GoOut
 
@@ -252,10 +254,10 @@ Func DoChest()
 
 	OpenChest()
 	RndSleep(1000)
-	PickupLootEx2()
+	GatherLoot()
 EndFunc ;DoChest
 
-Func PickupLootEx2($iMaxDist = 3000, $bCanPickup = True)
+Func GatherLoot($iMaxDist = 3000, $bCanPickup = True)
 	$lMe = GetAgentByID(-2)
 	For $i = 1 To GetMaxAgents()
 		$aAgent = GetAgentByID($i)

@@ -22,7 +22,7 @@ Func MainLoop()
         Sleep(500)
     WEnd
     Identify()
-    MsgBox(0, "Success", "Inventory has been identified for " & $charname)
+    MsgBox(0, "Success", "Inventory has been identified for " & $charname, 2000)
     $BOT_RUNNING = False
     GUICtrlSetState($CharInput, $GUI_ENABLE)
     GUICtrlSetState($StartButton, $GUI_ENABLE)
