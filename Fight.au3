@@ -11,8 +11,6 @@ Global $GUI
 Global $CharInput
 Global $StartButton
 Global $charname
-Global $BAGS_TO_USE = 4
-Global $USE_SUPERIOR_ID_KIT = True
 
 GUI()
 MainLoop()
@@ -21,8 +19,7 @@ Func MainLoop()
     While Not $BOT_RUNNING
         Sleep(500)
     WEnd
-    Identify()
-    MsgBox(0, "Success", "Inventory has been identified for " & $charname, 2000)
+    Fight()
     $BOT_RUNNING = False
     GUICtrlSetState($CharInput, $GUI_ENABLE)
     GUICtrlSetState($StartButton, $GUI_ENABLE)
@@ -70,37 +67,49 @@ Func _exit()
 EndFunc
 #EndRegion Handlers
 
-#Region Identification
-Func Identify()
-    Local $item, $bag
+Func Fight()
+	$target = GetNearestEnemyToAgent()
+	ChangeTarget($target)
+	RndSleep(150)
 
-    For $i = 1 To $BAGS_TO_USE
-        $bag = GetBag($i)
+	Do
+		CallTarget($target)
+		RndSleep(150)
 
-        If Not RetrieveIdentificationKit($USE_SUPERIOR_ID_KIT) Then Return
-        For $j = 1 To DllStructGetData($bag, "slots")
-            $item = GetItemBySlot($i, $j)
-            If DllStructGetData($item, "Id") == 0 Then ContinueLoop
-            IdentifyItem($item) ;hasSleep
-        Next
-    Next
-EndFunc ;Identify
-Func RetrieveIdentificationKit($expert = True)
-    If FindIdentificationKit() Then Return True
+		Do
+			Attack($target)
+			RndSleep(150)
+			UseSkills()
+			RndSleep(150)
+		Until Not TargetIsAlive()
 
-    If GetGoldCharacter() < 500 And GetGoldStorage() > 499 Then
-        WithdrawGold(500)
-        RndSleep(500)
-    EndIf
-    Local $j = 0
-    Do
-        $expert ? BuySuperiorIdentificationKit() : BuyIdentificationKit()
-        RndSleep(500)
-        $j = $j + 1
-    Until FindIdentificationKit() <> 0 Or $j == 3
-    If $j == 3 Then Return False
+		$target = GetNearestEnemyToAgent()
+		ChangeTarget($target)
+		RndSleep(300)
+	Until $target = 0 Or Not TargetIsInRange()
+	RndSleep(250)
+EndFunc ;Fight
 
-    RndSleep(500)
-    Return FindIdentificationKit()
-EndFunc ;RetrieveIdentificationKit
-#EndRegion Identification
+Func UseSkills()
+	For $i = 1 To 8
+		If Not TargetIsAlive() Then ExitLoop
+		$skillId = GetSkillbarSkillID($i)
+
+        If GetSkillbarSkillRecharge($skillId) <> 0 Then ContinueLoop
+        If GetEnergy() < GetEnergyCost($skillId) Then ContinueLoop
+        If GetSkillbarSkillAdrenaline($i) < GetAdrenalineCost($skillId) Then ContinueLoop
+
+		UseSkill($i, -1)
+		RndSleep(GetActivationTime($skillId) + 500)
+		Do
+			Sleep(200)
+		Until Not GetIsCasting()
+	Next
+EndFunc ;UseSkill
+
+Func TargetIsAlive()
+	Return DllStructGetData(GetCurrentTarget(), 'HP') > 0 And DllStructGetData(GetCurrentTarget(), 'Effects') <> 0x0010
+EndFunc ;TargetIsAlive
+Func TargetIsInRange()
+	Return GetDistance(GetCurrentTarget()) < 1400
+EndFunc ;TargetIsInRange

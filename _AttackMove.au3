@@ -49,7 +49,7 @@ Func Fight()
 			RndSleep(200)
 			UseSkills()
 			RndSleep(150)
-		Until Not TargetIsAlive() Or GetIsDead()
+		Until Not TargetIsAlive() Or Not TargetIsInRange() Or GetIsDead()
 
 		$target = GetNearestEnemyToAgent()
 		ChangeTarget($target)
@@ -60,15 +60,18 @@ EndFunc ;Fight
 
 Func UseSkills()
 	For $i = 1 To 8
-		If Not TargetIsAlive() Then
-			ExitLoop
-		EndIf
-		If DllStructGetData(GetSkillBar(), "Recharge" & $i) <> 0 Then ContinueLoop
-		If GetEnergy() < GetEnergyCost(GetSkillbarSkillID($i)) Then ContinueLoop
-		;If GetSkillbarSkillAdrenaline($i + 1) < DllStructGetData(GetSkillByID(GetSkillbarSkillID($i)), 'Adrenaline') Then ContinueLoop
+		If Not TargetIsAlive() Then ExitLoop
+		$skillId = GetSkillbarSkillID($i)
 
-		UseSkill($i)
-		RndSleep(GetActivationTime(GetSkillbarSkillID($i)) * 1000 + 750)
+		If GetSkillbarSkillRecharge($skillId) <> 0 Then ContinueLoop
+		If GetEnergy() < GetEnergyCost($skillId) Then ContinueLoop
+		If GetSkillbarSkillAdrenaline($i) < GetAdrenalineCost($skillId) Then ContinueLoop
+
+		UseSkill($i, -1)
+		RndSleep(GetActivationTime($skillId) + 500)
+		Do
+			Sleep(200)
+		Until Not GetIsCasting()
 	Next
 EndFunc ;UseSkill
 

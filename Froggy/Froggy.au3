@@ -547,7 +547,7 @@ Global $edtLog = _GUICtrlRichEdit_Create($frmMain, "", 128, 47, 254, 130, BitOR(
 _GUICtrlRichEdit_SetFont($edtLog, 9, "Arial")
 _GUICtrlRichEdit_SetCharColor($edtLog, "65280")
 _GUICtrlRichEdit_SetText($edtLog, StringFormat("#########################\r\n\r\nFroggy Bot v0.6 By logicdoor. Enjoy\r\n\r\n#########################\r\n\r\n"))
-Global $inpInit = GUICtrlCreateInput('WinGetProcess("Guild Wars")', 232, 8, 156, 24)
+Global $charname = GUICtrlCreateInput('WinGetProcess("Guild Wars")', 232, 8, 156, 24)
 Global $btnStart = GUICtrlCreateButton("Start", $X_GUI, $Y_GUI, 113, 25)
 Global $grpGeneralStats = GUICtrlCreateGroup("Settings", $X_GUI, 40, 110, 136)
 Global $Render  = GUICtrlCreateCheckbox("Render", $X_GUI+8, 56, 76, 17)
@@ -861,8 +861,8 @@ EndFunc
 
 Func BotStartup()
 	GUICtrlSetState($btnStart, $GUI_DISABLE)
-	GUICtrlSetState($inpInit, $GUI_DISABLE)
-	$sInitMethod = GUICtrlRead($inpInit)
+	GUICtrlSetState($charname, $GUI_DISABLE)
+	$sInitMethod = GUICtrlRead($charname)
 	If Not Initialize($sInitMethod, True) Then
 		If Not Initialize($GuildWars, True) Then
 			Out("Initialization Failed!")

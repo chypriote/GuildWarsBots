@@ -3,37 +3,24 @@
 #Region ### START Koda GUI section ### Form=s
 Global $frmMain = GUICreate("Froggy v2.0", 390, 312, 200, 124)
 GUISetFont(9, 400, 0, "Arial")
-Global $edtLog = _GUICtrlRichEdit_Create($frmMain, "", 128, 47, 254, 130, BitOR($ES_MULTILINE, $WS_VSCROLL, $ES_READONLY))
-_GUICtrlRichEdit_SetFont($edtLog, 9, "Arial")
-_GUICtrlRichEdit_SetCharColor($edtLog, "65280")
-_GUICtrlRichEdit_SetText($edtLog, StringFormat("Froggy Bot\n"))
-Global $inpInit = GUICtrlCreateCombo('', 200, 8, 156, 24)
-	GUICtrlSetData($inpInit, GetLoggedCharNames())
-Global $btnStart = GUICtrlCreateButton("Start", 8, 8, 113, 25)
+Global $edtLog = _GUICtrlRichEdit_Create($frmMain, "", 128, 8, 254, 167, BitOR($ES_MULTILINE, $WS_VSCROLL, $ES_READONLY))
+	_GUICtrlRichEdit_SetFont($edtLog, 9, "Arial")
+	_GUICtrlRichEdit_SetCharColor($edtLog, "65280")
+	_GUICtrlRichEdit_SetText($edtLog, StringFormat("Froggy Bot\n"))
+Global $charname = GUICtrlCreateCombo('', 8, 8, 110, 24)
+	GUICtrlSetData($charname, GetLoggedCharNames())
+Global $btnStart = GUICtrlCreateButton("Start", 8, 40, 110, 25)
+	GUICtrlSetOnEvent($btnStart, "BotStartup")
 
-Global $grpGeneralStats = GUICtrlCreateGroup("Settings", 8, 40, 110, 136)
-Global $Rendering = GUICtrlCreateCheckbox("Render", 16, 56, 76, 17)
+Global $grpSettings = GUICtrlCreateGroup("Settings", 8, 72, 110, 104)
+	GUICtrlSetFont($grpSettings, 9, 800, 0, "Arial")
+Global $Rendering = GUICtrlCreateCheckbox("Render", 16, 88, 76, 17)
 	GUICtrlSetOnEvent($Rendering, "ToggleRendering")
 	GUICtrlSetFont($Rendering, 9, -1, 0, "Arial")
 
-Global $Purge = GUICtrlCreateCheckbox("Purge",     16, 72, 70, 17)
+Global $Purge = GUICtrlCreateCheckbox("Purge", 16, 104, 90, 17)
 	GUICtrlSetOnEvent($Purge, "Purgehook")
 	GUICtrlSetFont($Purge, 9, -1, 0, "Arial")
-
-Global $Open_Chests = GUICtrlCreateCheckbox("Open Chests", 16, 120, 90, 17)
-	GUICtrlSetOnEvent($Open_Chests, "ToggleOpenChests")
-    GUICtrlSetFont($Open_Chests, 9, -1, 0, "Arial")
-    GUICtrlSetState($Open_Chests, $GUI_CHECKED)
-
-Global $Store_Golds = GUICtrlCreateCheckbox("Store Golds", 16, 136, 90, 17)
-	GUICtrlSetOnEvent($Store_Golds, "ToggleStore")
-	GUICtrlSetFont($Store_Golds, 9, -1, 0, "Arial")
-    GUICtrlSetState($Store_Golds, $GUI_CHECKED)
-
-Global $Sell_Items = GUICtrlCreateCheckbox("Auto-Sell", 16, 152, 70, 17)
-	GUICtrlSetOnEvent($Sell_Items, "ToggleSell")
-	GUICtrlSetFont($Sell_Items, 9, -1, 0, "Arial")
-    GUICtrlSetState($Sell_Items, $GUI_CHECKED)
 
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 Global $grpGeneralStats = GUICtrlCreateGroup("General Statistics", 8, 184, 182, 120)
@@ -125,18 +112,9 @@ Global $lblTomesData = GUICtrlCreateLabel("0", 310, 280, 64, 30, $SS_CENTER)
 GUISetState(@SW_SHOW)
 #EndRegion ### END Koda GUI section ###
 
-GUICtrlSetOnEvent($btnStart, "BotStartup")
 GUISetOnEvent($GUI_EVENT_CLOSE, "ExitBot")
 
 #Region Toggles
-Func ToggleOpenChests()
-	$Open_Chests = Not $Open_Chests
-EndFunc ;ToggleOpenChests
-
-Func ToggleStore()
-	$Store_Golds = Not $Store_Golds
-EndFunc ;==>ToggleIdent and identifies bags
-
 Func ToggleSell()
 	$Sell_Items = Not $Sell_Items
 EndFunc ;==> ToggleSellItems

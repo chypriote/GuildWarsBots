@@ -7,8 +7,9 @@
 #include "../GWA2.au3"
 #include "GUI.au3"
 #include "../_SimpleInventory.au3"
-TraySetIcon("froggy.ico")
-;AutoItSetOption("TrayIconDebug", 1)
+GUISetIcon(@ScriptDir & "\froggy.ico")
+TraySetIcon(@ScriptDir & "\froggy.ico")
+TraySetToolTip("Froggy v2.0")
 
 Opt("GUIOnEventMode", 1)
 
@@ -18,7 +19,6 @@ Global Const $GADDS_ENCAMPMENT = 638
 Global Const $SPARKFLY_SWAMP = 558
 Global Const $BOGROOT_GROWTH_LEVEL1 = 615
 Global Const $BOGROOT_GROWTH_LEVEL2 = 616
-Global Const $MAP_ID_BALTH_TEMPLE = 248
 Global Const $ASURAN_BUFFS[5] = [2434, 2435, 2436, 2481, 2548]
 Global Const $DWARVEN_BUFFS[9] = [2445, 2446, 2447, 2448, 2549, 2565, 2566, 2567, 2568]
 Global $IS_RUNNING = False
@@ -37,23 +37,12 @@ Global $iTomeCount = 0
 Global $DeadOnTheRun = False
 Global $OpenedChestAgentIDs[1]  ;dirty fix for not using TargetNearestItem() (black list variable as previously opened chests were not targeted using TargetNearestItem(), now they are)
 Global $aOldWaypointX, $aOldWaypointY
-Global $coords[2]
-
 
 ; Config
-Global $UseBags = 4 ; sets number of bags to be used
 Global $Rendering = True
-Global $Sell_Items = True
-Global $Open_Chests = True
-Global $Store_Golds = True
 Global $Purge = False
 
 ;Template dervish OgGjkirMrSxgmXfbdbibaXNX7gA
-Global $intSkillEnergy[8] = [0, 10, 5, 10, 0, 5, 5, 0]
-; Change the next lines to your skill casting times in milliseconds. use ~250 for shouts/stances, ~1000 for attack skills:
-Global $intSkillCastTime[8] = [250, 250, 500, 250, 250, 250, 1000, 1000]
-; Change the next lines to your skill adrenaline count (1 to 8). leave as 0 for skills without adren
-Global $intSkillAdrenaline[8] = [200, 0, 0, 0, 100, 0, 0, 130]
 
 While 1
 	Sleep(100)
@@ -95,9 +84,9 @@ EndFunc
 
 Func BotStartup()
 	GUICtrlSetState($btnStart, $GUI_DISABLE)
-	GUICtrlSetState($inpInit, $GUI_DISABLE)
+	GUICtrlSetState($charname, $GUI_DISABLE)
 
-	$sInitMethod = GUICtrlRead($inpInit)
+	$sInitMethod = GUICtrlRead($charname)
 	If Not Initialize($sInitMethod, True) Then
 		If Not Initialize($GuildWars, True) Then
 			Out("Initialization Failed!")
@@ -105,7 +94,8 @@ Func BotStartup()
 		EndIf
 	EndIf
 
-	Global $aPlayerAgent = GetAgentByID(-2)
+	WinSetTitle($frmMain, "", "" & $charname & " - Froggy v2.0")
+	TraySetToolTip("" & $charname & " - Froggy v2.0")
 	Global $nTotalTime = TimerInit()
 	AdlibRegister("TotalTime", 1000)
 
@@ -348,7 +338,7 @@ Func Boss()
 		MoveandAggro($aWaypointsBoss)
 	Endif
 
-	$nearestEnemy = GetnearestEnemyToAgent($aPlayerAgent)
+	$nearestEnemy = GetNearestEnemyToAgent()
 	$NearestDistance = @extended
 	If $NearestDistance > 3000 Then
 		Out("Boss Group Dead")
@@ -400,6 +390,12 @@ Func GetDwarvenBlessing($iX, $iY)
 	Out("Unable To Get Dwarven Blessing")
 EndFunc ;GetDwarvenBlessing
 
+Func GoMerchant()
+	TravelTo($GADDS_ENCAMPMENT)
+	GoNPC(GetNearestNPCToCoords(-8339, -22433))
+	RndSleep(550)
+EndFunc
+
 Func Out($sMessage)
 	ConsoleWrite($sMessage & @CRLF)
 	_GUICtrlRichEdit_SetFont($edtLog, 8, "Trebuchet MS")
@@ -437,12 +433,13 @@ EndFunc ;GetNearestWaypointIndex
 
 #Region Move
 Func AggroMoveToEx($x, $y, $z = 1200) ;Reduced from 2000
+	Local $coords[2]
 	$iBlocked = 0
 	Move($x, $y, 50)
 	$Me = GetAgentByID()
 	$coords[0] = DllStructGetData($Me, 'X')
 	$coords[1] = DllStructGetData($Me, 'Y')
-	If $Open_Chests Then CheckForChest()
+	CheckForChest()
 	Do
 		RndSleep(250)
 		$oldCoords = $coords
@@ -483,7 +480,7 @@ Func AggroMoveToEx($x, $y, $z = 1200) ;Reduced from 2000
 	If $iBlocked > 60 Then Fight()
 	$aOldWaypointX = $x
 	$aOldWaypointY = $y
-	If $Open_Chests Then CheckForChest()
+	CheckForChest()
 	If Not InventoryIsFull() Then PickupLootEx()
 EndFunc ;AggroMoveToEx
 
@@ -500,22 +497,29 @@ Func Fight()
 			Attack($target)
 			UseSkills()
 			RndSleep(150)
-		Until Not TargetIsAlive()
+		Until Not TargetIsAlive() Or Not TargetIsInRange() Or GetIsDead()
 
 		$target = GetNearestEnemyToAgent()
 		ChangeTarget($target)
 		RndSleep(300)
-	Until $target = 0 Or Not TargetIsInRange()
+	Until $target = 0 Or Not TargetIsInRange() Or GetIsDead()
 	RndSleep(250)
 EndFunc ;Fight
 
 Func UseSkills()
-	For $i = 0 To 7
+	For $i = 1 To 8
 		If Not TargetIsAlive() Then ExitLoop
-		If Not IsRecharged($i) And GetEnergy() < $intSkillEnergy[$i] And GetSkillbarSkillAdrenaline($i + 1) < $intSkillAdrenaline[$i] Then ContinueLoop
+		$skillId = GetSkillbarSkillID($i)
 
-		UseSkill($i + 1)
-		RndSleep(500)
+		If GetSkillbarSkillRecharge($skillId) <> 0 Then ContinueLoop
+		If GetEnergy() < GetEnergyCost($skillId) Then ContinueLoop
+		If GetSkillbarSkillAdrenaline($i) < GetAdrenalineCost($skillId) Then ContinueLoop
+
+		UseSkill($i, -1)
+		RndSleep(GetActivationTime($skillId) + 500)
+		Do
+			Sleep(200)
+		Until Not GetIsCasting()
 	Next
 EndFunc ;UseSkill
 

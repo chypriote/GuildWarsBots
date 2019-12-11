@@ -3254,6 +3254,10 @@ Func GetEnergyCost($aSkillId)
     EndSwitch
 EndFunc   ;==>GetEnergyCost
 
+Func GetAdrenalineCost($aSkillId)
+    Return DllStructGetData(GetSkillByID($aSkillId), 'Adrenaline')
+EndFunc   ;==>GetAdrenalineCost
+
 ;~ Description: Returns activation time of a skill.
 Func GetActivationTime($aSkillId)
 	Return DllStructGetData(GetSkillByID($aSkillId), 'Activation')
