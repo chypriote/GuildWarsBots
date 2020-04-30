@@ -84,9 +84,9 @@ EndFunc
 
 Func BotStartup()
 	GUICtrlSetState($btnStart, $GUI_DISABLE)
-	GUICtrlSetState($charname, $GUI_DISABLE)
+	GUICtrlSetState($inpInit, $GUI_DISABLE)
 
-	$sInitMethod = GUICtrlRead($charname)
+	$sInitMethod = GUICtrlRead($inpInit)
 	If Not Initialize($sInitMethod, True) Then
 		If Not Initialize($GuildWars, True) Then
 			Out("Initialization Failed!")
@@ -94,6 +94,7 @@ Func BotStartup()
 		EndIf
 	EndIf
 
+	Local $charname = GetCharname()
 	WinSetTitle($frmMain, "", "" & $charname & " - Froggy v2.0")
 	TraySetToolTip("" & $charname & " - Froggy v2.0")
 	Global $nTotalTime = TimerInit()
@@ -203,7 +204,7 @@ Func BogrootLvl1()
 	$DeadOnTheRun = False
 
 	; Level 1
-	Local $aWaypointsLevel1[19][4] = [ _
+	Local $aWaypointsLevel1 = [ _
 	[16342, 8640, 1500, "First Group"], _
 	[10387, 7205, 1500, "Nettle Spores"], _
 	[10222, 8325, 1500, "Blooming/Nettle Spores"], _
@@ -217,6 +218,7 @@ Func BogrootLvl1()
 	[-478, -7580, 1500, "Poison Traps"], _
 	[512, -8861, 1500, "Gokir"], _
 	[1230, -9846, 1500, "Ayahuasca"], _
+	[1499, -10206, 1500, "Avoiding trap"], _
 	[1693, -12198, 1500, "Nettle Spores"], _
 	[1072, -13738, 1500, "Blooming Nettles"], _
 	[1668, -14944, 1500, "Ayahuasca/Oakheart"], _
@@ -298,7 +300,7 @@ Func BogrootLvl2()
 
 	MoveandAggro($aWaypointsLevel2)
 	If $DeadOnTheRun Then
-	   Out("Party wipe, restarting at "& $aWaypointsLevel2[$NearestWaypoint][3])
+	   Out("Party wipe, restarting")
 	   $DeadOnTheRun = False
 	   MoveandAggro($aWaypointsLevel2)
 	Endif
@@ -410,7 +412,7 @@ Func MoveandAggro($aWaypoints)
 
 	For $i = $iStart to $iFinish step $iStep
 		Out("Moving to waypoint: " & $aWaypoints[$i][0] & ", " & $aWaypoints[$i][1])
-		AggroMoveToEx($aWaypoints[$i][0], $aWaypoints[$i][1], $aWaypoints[$i][2])
+		If Not AggroMoveToEx($aWaypoints[$i][0], $aWaypoints[$i][1], $aWaypoints[$i][2]) Then Return MoveAndAggro($aWaypoints)
 	Next
 EndFunc ;MoveandAggro
 
@@ -434,7 +436,7 @@ EndFunc ;GetNearestWaypointIndex
 #Region Move
 Func AggroMoveToEx($x, $y, $z = 1200) ;Reduced from 2000
 	Local $coords[2]
-	$iBlocked = 0
+	Local $iBlocked = 0
 	Move($x, $y, 50)
 	$Me = GetAgentByID()
 	$coords[0] = DllStructGetData($Me, 'X')
@@ -464,24 +466,23 @@ Func AggroMoveToEx($x, $y, $z = 1200) ;Reduced from 2000
 		 $coords[1] = DllStructGetData($Me, 'Y')
 		 If $oldCoords[0] = $coords[0] And $oldCoords[1] = $coords[1] Then
 			$iBlocked += 1
-			If $iBlocked >= 10 Then
+			If $iBlocked >= 5 Then
 				MoveTo($coords[0], $coords[1], 500)
-			ElseIf $iBlocked >= 20 Then
-				Move($aOldWaypointX, $aOldWaypointY, 500) ; Try going back a waypoint
-			ElseIf $iBlocked >= 40 Then
-				Out("Something is wrong, Stuck too many times, Restarting.")
-				Setup() ; Go back to Gadds, Something has gone wrong
+			ElseIf $iBlocked >= 10 Then
+				Out("Trying to move back")
+				Return False ; Try going back a waypoint
 			EndIf
 			MoveTo($coords[0], $coords[1], 500)
-			Sleep(GetPing()+500)
+			RndSleep(500)
 			Move($x, $y, 50)
 		 EndIf
-	Until ComputeDistance($coords[0], $coords[1], $x, $y) < 250 Or $iBlocked > 60 Or $DeadOnTheRun
-	If $iBlocked > 60 Then Fight()
+	Until ComputeDistance($coords[0], $coords[1], $x, $y) < 250 Or $iBlocked >= 20 Or $DeadOnTheRun
+
 	$aOldWaypointX = $x
 	$aOldWaypointY = $y
 	CheckForChest()
 	If Not InventoryIsFull() Then PickupLootEx()
+	Return True
 EndFunc ;AggroMoveToEx
 
 Func Fight()

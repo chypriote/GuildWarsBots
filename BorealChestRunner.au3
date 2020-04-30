@@ -164,7 +164,7 @@ EndFunc ;TravelToOutpost
 
 Func Setup()
 	SwitchMode(GUICtrlRead($HardMode) == $GUI_CHECKED)
-	LeaveGroup()
+	KickAllHeroes()
 	LoadSkillTemplate("OwET0YIWV6usrgmktAkAAAAAAAA")
 	Out("Setup resign")
 	MoveTo(5520, -27828)

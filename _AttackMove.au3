@@ -1,8 +1,6 @@
 #include-once
 #include <Array.au3>
 
-Out("AttackMove loaded")
-
 Func FollowPath($aWaypoints)
 	$iStart = GetNearestWaypointIndex($aWaypoints)
 	$iFinish = UBound($aWaypoints) - 1
@@ -80,13 +78,14 @@ Func DoChest()
 	Local $TimeCheck = TimerInit()
 
 	TargetNearestItem()
-	If DllStructGetData(GetCurrentTarget(), 'Type') <> 512 Then Return False
+	$agent = GetCurrentTarget()
+	If DllStructGetData($agent, 'Type') <> 512 Then Return False
+	If DllStructGetData($agent, 'ExtraType') <> 4582 And DllStructGetData($agent, 'ExtraType') <> 8141 Then Return False
 	Out("Found chest")
 
-	GoSignpost(-1)
-	$chest = GetCurrentTarget()
-	$oldCoordsX = DllStructGetData($chest, "X")
-	$oldCoordsY = DllStructGetData($chest, "Y")
+	GoSignpost($agent)
+	$oldCoordsX = DllStructGetData($agent, "X")
+	$oldCoordsY = DllStructGetData($agent, "Y")
 
 	Do
 		Sleep(1000)
@@ -130,7 +129,6 @@ EndFunc ;Loot
 Func CanPickUp($item)
 	Local $ModelID = DllStructGetData($item, 'ModelID')
 	Local $ExtraID = DllStructGetData($item, 'ExtraID')
-	Local $type = DllStructGetData($item, 'Type')
 	Local $rarity = GetRarity($item)
 
 	If $ModelID == $GOLD_COINS And GetGoldCharacter() < 99000 Then Return True
@@ -163,13 +161,13 @@ Func EnemyInRange()
 	$enemy = GetNearestEnemyToAgent()
 	If $enemy = 0 Then Return False
 
-	Return GetDistance($enemy) < 1400
+	Return GetDistance($enemy) < 1350
 EndFunc ;EnemyInRange
 Func TargetIsAlive()
 	Return DllStructGetData(GetCurrentTarget(), 'HP') > 0 And DllStructGetData(GetCurrentTarget(), 'Effects') <> 0x0010
 EndFunc ;TargetIsAlive
 Func TargetIsInRange()
-	Return GetDistance(GetCurrentTarget()) < 1400
+	Return GetDistance(GetCurrentTarget()) < 1350
 EndFunc ;TargetIsInRange
 Func GetNearestWaypointIndex($aWaypoints)
 	Local $lNearestWaypoint, $lNearestDistance = 100000000

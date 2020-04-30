@@ -7,8 +7,8 @@ Global $edtLog = _GUICtrlRichEdit_Create($frmMain, "", 128, 8, 254, 167, BitOR($
 	_GUICtrlRichEdit_SetFont($edtLog, 9, "Arial")
 	_GUICtrlRichEdit_SetCharColor($edtLog, "65280")
 	_GUICtrlRichEdit_SetText($edtLog, StringFormat("Froggy Bot\n"))
-Global $charname = GUICtrlCreateCombo('', 8, 8, 110, 24)
-	GUICtrlSetData($charname, GetLoggedCharNames())
+Global $inpInit = GUICtrlCreateCombo('', 8, 8, 110, 24)
+	GUICtrlSetData($inpInit, GetLoggedCharNames())
 Global $btnStart = GUICtrlCreateButton("Start", 8, 40, 110, 25)
 	GUICtrlSetOnEvent($btnStart, "BotStartup")
 
