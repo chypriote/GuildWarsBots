@@ -1,6 +1,5 @@
 #include-once
 #include <Array.au3>
-#include "_Constants.au3"
 
 #Region About
 #cs
@@ -33,8 +32,8 @@ Func Inventory()
     Store()
     Out("Identifying")
     Identify()
-    Out("Salvaging")
-    Salvage()
+    ;~ Out("Salvaging")
+    ;~ Salvage()
     Out("Selling")
     Sell()
 

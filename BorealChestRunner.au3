@@ -1,9 +1,10 @@
 #include <ButtonConstants.au3>
 #include <GUIConstantsEx.au3>
 #include <StaticConstants.au3>
-#include "GWA2.au3"
+#include "GWA2/GWA2.au3"
 #include "_SimpleInventory.au3"
-#include "Extras.au3"
+GUISetIcon(@ScriptDir & "\chest.ico")
+TraySetIcon(@ScriptDir & "\chest.ico")
 #NoTrayIcon
 
 Opt("GUIOnEventMode", True)
@@ -279,7 +280,7 @@ Func GatherLoot($iMaxDist = 3000, $bCanPickup = True)
 			Wend
 		EndIf
 	Next
-EndFunc ;PickupLootEx
+EndFunc ;GatherLoot
 #EndRegion Chestrun
 
 #Region Funcs
@@ -374,20 +375,6 @@ Func GetLockpicksCount()
 	Next
 	Return $AmountPicks
 EndFunc ;GetLockpicksCount
-
-Func UseSkillEx($lSkill, $lTgt=-2, $aTimeout = 10000)
-	If GetIsDead() Then Return
-	If Not IsRecharged($lSkill) Then Return
-
-	Local $lDeadlock = TimerInit()
-	UseSkill($lSkill, $lTgt)
-
-	Do
-		RndSleep(50)
-		If GetIsDead() Then Return
-	Until (Not IsRecharged($lSkill)) Or (TimerDiff($lDeadlock) > $aTimeout)
-	RndSleep(200)
-EndFunc
 
 Func GoMerchant()
 	GoToNPC(GetNearestNPCToCoords(7319, -24874))
