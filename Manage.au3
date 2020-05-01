@@ -1,6 +1,6 @@
 #include <ComboConstants.au3>
 #include <GUIConstantsEx.au3>
-#include <GWA2.au3>
+#include <GWA2/GWA2.au3>
 #include "_SimpleInventory.au3"
 AUTOITSETOPTION("TrayIconDebug", 1)
 

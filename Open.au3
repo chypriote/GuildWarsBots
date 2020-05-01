@@ -1,6 +1,6 @@
 #include <ComboConstants.au3>
 #include <GUIConstantsEx.au3>
-#include <GWA2.au3>
+#include <GWA2/GWA2.au3>
 #NoTrayIcon
 
 Opt("GUIOnEventMode", True)
@@ -69,7 +69,7 @@ Func _exit()
 EndFunc
 #EndRegion Handlers
 
-#Region Identification
+#Region Opening
 Func Open()
     Local $item, $bag
 
@@ -88,4 +88,4 @@ Func Open()
         Next
     Next
 EndFunc ;Open
-#EndRegion Identification
+#EndRegion Opening

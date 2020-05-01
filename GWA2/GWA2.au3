@@ -1042,14 +1042,18 @@ Func WithdrawGold($aAmount = 0)
 	ChangeGold($lCharacter + $lAmount, $lStorage - $lAmount)
 EndFunc   ;==>WithdrawGold
 
+Func GetEnergyCostEx($Skill)
+	Return StringReplace(StringReplace(StringReplace(StringMid(DllStructGetData($Skill, 'Unknown4'), 6, 1), 'C', '25'), 'B', '15'), 'A', '10')
+EndFunc
+
 ;~ Description: Use a skill and wait for it to be used.
 Func UseSkillEx($lSkill, $lTgt = -2, $aTimeout = 3000)
 	If GetIsDead() Then Return
 	If Not IsRecharged($lSkill) Then Return
 
 	Local $Skill = GetSkillByID(GetSkillbarSkillID($lSkill, 0))
-	Local $Energy = StringReplace(StringReplace(StringReplace(StringMid(DllStructGetData($Skill, 'Unknown4'), 6, 1), 'C', '25'), 'B', '15'), 'A', '10')
-	If GetEnergy(-2) < $Energy Then Return
+
+	If GetEnergy(-2) < GetEnergyCostEx($Skill) Then Return
 	Local $lAftercast = DllStructGetData($Skill, 'Aftercast')
 
 	Local $lDeadlock = TimerInit()
@@ -1578,7 +1582,7 @@ Func CallTarget($aTarget)
 		$lTargetID = DllStructGetData($aTarget, 'ID')
 	EndIf
 
-	Return SendPacket(0xC, $HEADER_CALL_TARGET, 0xA, $lTargetID)
+	;Return SendPacket(0xC, $HEADER_CALL_TARGET, 0xA, $lTargetID)
 EndFunc   ;==>CallTarget
 
 ;~ Description: Clear current target.
