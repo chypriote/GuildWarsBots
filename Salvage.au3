@@ -81,7 +81,7 @@ Func Salvage()
             $item = GetItemBySlot($i, $j)
             If DllStructGetData($item, "ModelId") == $ITEM_FEATHERED_CREST Then SalvageCrests($item)
             If CanSalvage($item) Then
-                StartSalvage($item, True) ;noSleep
+                StartSalvage($item) ;noSleep
                 RndSleep(1000)
                 SalvageMaterials()
                 RndSleep(750)
@@ -93,8 +93,8 @@ Func SalvageCrests($item)
     Local $q = DllStructGetData($item, 'Quantity')
     For $i = 0 to $q
         RetrieveSalvageKit()
-        StartSalvage($item, True) ;noSleep
-        RndSleep(1000)
+        StartSalvage($item) ;noSleep
+        RndSleep(10000)
         SalvageMaterials()
         RndSleep(750)
     Next

@@ -2802,4 +2802,29 @@ Func GetProfessionFullName($aProf)
 			Return "Dervish"
 	EndSwitch
 EndFunc   ;==>GetProfessionFullName
+
+Func GetProfPrimaryAttribute($aProfession)
+	Switch $aProfession
+		Case $PROF_WARRIOR
+			Return $ATTR_STRENGTH
+		Case $PROF_RANGER
+			Return $ATTR_EXPERTISE
+		Case $PROF_MONK
+			Return $ATTR_DIVINE_FAVOR
+		Case $PROF_NECROMANCER
+			Return $ATTR_SOUL_REAPING
+		Case $PROF_MESMER
+			Return $ATTR_FAST_CASTING
+		Case $PROF_ELEMENTALIST
+			Return $ATTR_ENERGY_STORAGE
+		Case $PROF_ASSASSIN
+			Return $ATTR_CRITICAL_STRIKES
+		Case $PROF_RITUALIST
+			Return $ATTR_SPAWNING_POWER
+		Case $PROF_PARAGON
+			Return $ATTR_LEADERSHIP
+		Case $PROF_DERVISH
+			Return $ATTR_MYSTICISM
+	EndSwitch
+EndFunc   ;==>GetProfPrimaryAttribute
 #EndRegion Profession

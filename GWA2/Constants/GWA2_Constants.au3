@@ -4,6 +4,7 @@
 #Region Global Items
 Global Const $GOLD_COINS = 2511
 
+Global Const $RARITY_GREEN = 2627
 Global Const $RARITY_GOLD = 2624
 Global Const $RARITY_PURPLE = 2626
 Global Const $RARITY_BLUE = 2623

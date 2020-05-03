@@ -205,7 +205,7 @@ Func Salvage()
         For $j = 1 To DllStructGetData($bag, 'Slots')
             $item = GetItemBySlot($i, $j)
             If CanSalvage($item) Then
-                StartSalvage($item, True) ;noSleep
+                StartSalvage($item) ;noSleep
                 RndSleep(1000)
                 SalvageMaterials()
                 RndSleep(750)
