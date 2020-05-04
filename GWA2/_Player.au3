@@ -80,8 +80,8 @@ EndFunc   ;==>Disconnected
 #EndRegion Status
 
 #Region Titles
-;~ Description: Returns if material is Rare.
-Func SetDisplayedTitle($aTitle = 0)
+;~ Description: Displays a title
+Func SetDisplayedTitle($aTitle = $TITLE_NONE)
 	If $aTitle Then
 		Return SendPacket(0x8, $HEADER_TITLE_DISPLAY, $aTitle)
 	Else

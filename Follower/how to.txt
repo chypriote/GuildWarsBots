@@ -1,0 +1,13 @@
+Run Follow Bot with you guild wars windows of the follower active.
+
+Fill the input on the interface.
+Mainacc name = The guy who you want to follow
+Bot Name = the guy following 
+
+cant follow in citys
+
+
+
+Press start
+
+PS : when passing a warp /portal, press pause button or it will crash

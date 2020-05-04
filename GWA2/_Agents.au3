@@ -422,6 +422,18 @@ Func GetAgentName($aAgent = -2)
 	Return $lName
 EndFunc   ;==>GetAgentName
 
+Func GetAgentGuild($aAgent = -2)
+
+	If IsDllStruct($aAgent) == 0 Then
+		Local $lAgentID = ConvertID($aAgent)
+		If $lAgentID = 0 Then Return ''
+	Else
+		Local $lAgentID = DllStructGetData($aAgent, 'ID')
+	EndIf
+
+	Return DllStructGetData($aAgent, 'GuildTag')
+EndFunc
+
 ;~ Description: Return the number of enemy agents targeting the given agent.
 Func GetAgentDanger($aAgent = -2, $aAgentArray = 0)
 	If IsDllStruct($aAgent) == 0 Then

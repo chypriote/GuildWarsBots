@@ -2828,3 +2828,13 @@ Func GetProfPrimaryAttribute($aProfession)
 	EndSwitch
 EndFunc   ;==>GetProfPrimaryAttribute
 #EndRegion Profession
+
+#Region Titles
+$TITLE_NONE = 0x00
+$TITLE_SPEARMARSHALL = 0x11
+$TITLE_LIGHTBRINGER = 0x14
+$TITLE_ASURAN = 0x26
+$TITLE_DWARVEN = 0x27
+$TITLE_VANGUARD = 0x28
+$TITLE_NORN = 0x29
+#EndRegion Titles
