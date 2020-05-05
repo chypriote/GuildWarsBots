@@ -78,19 +78,15 @@ Func CanStore($item)
     Local $ModelID = DllStructGetData($item, "ModelId")
     Local $rarity = GetRarity($item)
 
-    If $rarity == $RARITY_GOLD          Then Return False
+    If $rarity == $RARITY_GOLD          Then Return True
     If $rarity == $RARITY_BLUE          Then Return False
     If $rarity == $RARITY_PURPLE		Then Return False
 
     If $ModelID == $TROPHY_DIESSA_CHALICE       Then Return True
     If $ModelID == $TROPHY_RIN_RELIC            Then Return True
     If $ModelID == $ITEM_LOCKPICK               Then Return False
-    If $ModelID == 953 							Then Return False ;Scales
-    If $ModelID == 949 							Then Return False ;Steel ingots
-    If $ModelID == 955 							Then Return False ;Granite
-    If $ModelID == 954 							Then Return False ;Chitine
-    If $ModelID == 925 							Then Return False ;Cloth
-    If InArray($ModelID, [$MAT_TANNED, $MAT_PLANKS]) Then Return False
+    Local $UnwantedMats = [$MAT_TANNED, $MAT_PLANKS, $MAT_SCALES, $MAT_STEEL_INGOT, $MAT_GRANITE, $MAT_CHITINE, $MAT_CLOTH]
+    If InArray($ModelID, $UnwantedMats)         Then Return False
     If $ModelID == $MAT_BONES 					Then Return True ;Bones
     If $ModelID == $ITEM_FEATHERED_CREST 		Then Return True
 
