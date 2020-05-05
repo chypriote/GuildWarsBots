@@ -78,25 +78,24 @@ Func CanStore($item)
     Local $ModelID = DllStructGetData($item, "ModelId")
     Local $rarity = GetRarity($item)
 
-    If $rarity == $RARITY_GOLD		  Then Return True
-    If $rarity == $RARITY_BLUE		  Then Return False
+    If $rarity == $RARITY_GOLD          Then Return False
+    If $rarity == $RARITY_BLUE          Then Return False
     If $rarity == $RARITY_PURPLE		Then Return False
 
     If $ModelID == $TROPHY_DIESSA_CHALICE       Then Return True
     If $ModelID == $TROPHY_RIN_RELIC            Then Return True
     If $ModelID == $ITEM_LOCKPICK               Then Return False
-    If $ModelID == 946 							Then Return False ;Planks
     If $ModelID == 953 							Then Return False ;Scales
     If $ModelID == 949 							Then Return False ;Steel ingots
     If $ModelID == 955 							Then Return False ;Granite
     If $ModelID == 954 							Then Return False ;Chitine
     If $ModelID == 925 							Then Return False ;Cloth
-    If $ModelID == 940 							Then Return False ;Tanned
+    If InArray($ModelID, [$MAT_TANNED, $MAT_PLANKS]) Then Return False
     If $ModelID == $MAT_BONES 					Then Return True ;Bones
     If $ModelID == $ITEM_FEATHERED_CREST 		Then Return True
 
-    If $ModelID == $ITEM_DYES 						Then Return False ;Dyes
-    If InArray($ModelID, $SPECIAL_DROPS_ARRAY)      Then Return False
+    If $ModelID == $ITEM_DYES 						Then Return True ;Dyes
+    If InArray($ModelID, $SPECIAL_DROPS_ARRAY)      Then Return True
     If InArray($ModelID, $ALL_TOMES_ARRAY)		    Then Return True ;Tomes
     If InArray($ModelID, $ALL_MATERIALS_ARRAY)		Then Return True ;Materials
     If InArray($ModelID, $ALL_TROPHIES_ARRAY)	    Then Return True ;Trophies
